@@ -7,6 +7,6 @@ def run_migration(repo_path: str):
     return result
 
 if __name__ == "__main__":
-    repo_path = "/tmp/neo_cf_repo_xyz"  # Example cloned repo path
+    repo_path = r"C:\Users\LakshmanNavaneethakr\AppData\Local\Temp\neo_cf_repo_g3dvzn2i"
     result = run_migration(repo_path)
     print("Migration complete. New folder:", result["output_path"])
