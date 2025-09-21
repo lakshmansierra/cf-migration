@@ -1,12 +1,8 @@
-from typing import Dict, Any, List
-from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage, SystemMessage
-
 import os
 import json
-
-# Configure LLM here (temperature 0 for deterministic outputs)
-_llm = ChatOpenAI(temperature=0, model="gpt-4o-mini")  # change model name if needed
+import re
+from typing import Dict, Any
+from utils.aicore_client import AICoreClient
 
 SYSTEM_PROMPT = """
 You are an expert assistant that detects which files in an SAP Neo application repository must be migrated to run on SAP Cloud Foundry.
@@ -18,21 +14,21 @@ Output a JSON object with a single key "plan" whose value is a list of objects w
 Return only valid JSON.
 """
 
-def plan_migration(repo_root: str) -> Dict[str, Any]:
+def plan_migration(repo_root: str, model_name: str = "gpt-4") -> Dict[str, Any]:
     """
-    Inspect the repo (file list, basic content) and ask LLM which files to transform and how.
-    Returns a plan dict: {'plan': [ {file, reason, action, target}, ... ] }
+    Inspect repo files and ask AI Core which ones to migrate.
     """
-    # gather some contextual filenames and small file snippets
+    client = AICoreClient()
+
+    # Gather repo files
     filenames = []
     snippets = {}
     for root, _, files in os.walk(repo_root):
         for fn in files:
             filenames.append(os.path.join(root, fn))
-    # convert to relative for readability
-    rel_files = [os.path.relpath(f, repo_root) for f in filenames][:400]  # limit length
 
-    # include a few relevant file contents (neo-app.json, mta.yaml, xs-app.json, xs-security.json)
+    rel_files = [os.path.relpath(f, repo_root) for f in filenames][:400]
+
     interesting = ["neo-app.json", "mta.yaml", "xs-app.json", "xs-security.json", "manifest.yml"]
     for f in filenames:
         if os.path.basename(f) in interesting:
@@ -42,56 +38,24 @@ def plan_migration(repo_root: str) -> Dict[str, Any]:
             except Exception:
                 snippets[os.path.relpath(f, repo_root)] = "<unreadable>"
 
-    # build prompt
     payload = {
-        "filenames": rel_files[:200],
-        "snippets": snippets
+        "messages": [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {
+                "role": "user",
+                "content": f"Repo context (JSON): {json.dumps({'filenames': rel_files, 'snippets': snippets}, indent=2)}\n"
+                           f"Produce a migration plan as JSON with key 'plan'."
+            },
+        ]
     }
 
-    human = HumanMessage(
-        content=f"""
-Repo context (JSON): {json.dumps(payload, indent=2)}
-Based on the repo context, produce a migration plan (JSON) describing which files to convert and how.
-Remember to return only JSON with key "plan".
-"""
-    )
+    resp = client.invoke_model(model_name, payload)
+    text = resp.get("result", {}).get("choices", [{}])[0].get("message", {}).get("content", "").strip()
 
-    msg = [_make_system(), human]
-    resp = _llm(msg)
-    text = resp.content.strip()
-
-    # Try to parse JSON - if LLM returns raw JSON, parse safely
-    import json
     try:
-        parsed = json.loads(text)
+        return json.loads(text)
     except Exception:
-        # fallback: attempt to find the first JSON object substring
-        import re
         m = re.search(r"\{.*\}", text, flags=re.S)
         if m:
-            parsed = json.loads(m.group(0))
-        else:
-            # fallback rule-based simple plan: look for neo-app.json and mta.yaml
-            parsed = {"plan": []}
-            if any("neo-app.json" in rf for rf in rel_files):
-                parsed["plan"].append({
-                    "file": "neo-app.json",
-                    "reason": "Contains Neo routing and application configuration",
-                    "action": "convert_manifest",
-                    "target": "manifest.yml"
-                })
-            if any("mta.yaml" in rf for rf in rel_files):
-                parsed["plan"].append({
-                    "file": "mta.yaml",
-                    "reason": "MTA descriptor present",
-                    "action": "convert_mta",
-                    "target": "mta.yaml"
-                })
-    return parsed
-
-def _make_system() -> SystemMessage:
-    return SystemMessage(content=SYSTEM_PROMPT)
-
-def _llm(messages):
-    # wrapper to call the ChatOpenAI model in a compatible way
-    return _llm.infer_messages(messages) if hasattr(_llm, "infer_messages") else _llm(messages)
+            return json.loads(m.group(0))
+        return {"plan": []}
