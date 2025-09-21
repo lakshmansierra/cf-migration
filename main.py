@@ -1,20 +1,32 @@
+# main.py
 import os
 from graph import run_migration
+from utils.file_ops import prepare_output_dir
 
 def main():
-    repo_path = r"C:\Users\LakshmanNavaneethakr\AppData\Local\Temp\neo_cf_repo_g3dvzn2i"
-    os.environ["OPENAI_API_KEY"] = "sk-your-key-here"
+    # Hardcoded source repo (Neo environment)
+    source_repo = r"C:\Users\LakshmanNavaneethakr\Downloads\Others\pra 1 1"
+    
 
-    if not os.path.exists(repo_path):
-        print("Repo path does not exist:", repo_path)
+    if not os.path.exists(source_repo):
+        print("Source repo path does not exist:", source_repo)
         return
 
-    print("Starting migration for:", repo_path)
-    result = run_migration(repo_path)
-    print("Migration complete.")
-    print("Output folder:", result["output_path"])
+    # Hardcoded destination repo path (new CF-deployable repo)
+    # We create a new folder inside temp with prefix
+    dest_repo = prepare_output_dir(base_prefix="cf_repo_")
+    print("Source Neo repo:", source_repo)
+    print("Destination CF repo will be:", dest_repo)
+
+    # Run migration
+    result = run_migration(source_repo)
+
+    # The output path from the workflow will be a temp folder created by the writer
+    output_path = result.get("output_path", dest_repo)
+    print("\nMigration complete.")
+    print("Output CF-deployable folder:", output_path)
     print("Files written/overwritten:")
-    for rel, path in result["written_files"].items():
+    for rel, path in result.get("written_files", {}).items():
         print(" -", rel, "->", path)
 
 if __name__ == "__main__":
