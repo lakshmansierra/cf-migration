@@ -1,3 +1,4 @@
+# utils/file_ops.py
 import os
 import shutil
 import tempfile
@@ -10,14 +11,11 @@ def prepare_output_dir(base_prefix: str = "cf_migrated_") -> str:
 def copy_repo_to_output(src_repo_path: str, dest_output_path: str) -> None:
     """
     Copy entire repository into output folder (preserve structure).
-    dirs_exist_ok=True requires Python 3.8+ shutil.copytree with this arg.
-    We'll perform a selective copy: create dest if not exists and copy files.
     """
     if not os.path.exists(src_repo_path):
         raise FileNotFoundError(f"Source repo path not found: {src_repo_path}")
 
     # Copy content recursively
-    # Use shutil.copytree if dest not exists else copy files
     for root, dirs, files in os.walk(src_repo_path):
         rel = os.path.relpath(root, src_repo_path)
         dest_root = os.path.join(dest_output_path, rel) if rel != "." else dest_output_path
@@ -39,10 +37,6 @@ def write_text_file(path: str, content: str) -> None:
         f.write(content)
 
 def find_files(root: str, names: List[str]) -> List[str]:
-    """
-    Find files whose basename matches any name in `names`.
-    Returns absolute paths.
-    """
     found = []
     for r, _, files in os.walk(root):
         for fn in files:
