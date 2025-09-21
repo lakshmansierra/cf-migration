@@ -62,7 +62,7 @@ def plan_migration(repo_root: str) -> Dict[str, Any]:
     prompt = json.dumps(prompt_obj, indent=2)
 
     # Use ChatOllama directly
-    resp = llm([HumanMessage(content=prompt)])
+    resp = llm.invoke([HumanMessage(content=prompt)])
 
     # Try to parse JSON
     try:
