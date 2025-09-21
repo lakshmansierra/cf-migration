@@ -19,7 +19,7 @@ You will receive a JSON object containing:
 For actions that produce a new file (e.g. convert_manifest), return the converted file content only.
 For copy_as_is, return the original content unchanged.
 If you cannot convert, return a JSON object like {"error":"reason"}.
-
+ 
 Return only the transformed file content or the small error JSON.
 """
 
