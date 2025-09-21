@@ -7,7 +7,7 @@ from utils.file_ops import read_text_file
 from langchain_ollama import ChatOllama
 from langchain.schema import HumanMessage
 
-llm = ChatOllama(model="llama3")
+llm = ChatOllama(model="gpt-oss:120b")
 
 SYSTEM_PROMPT = """
 You are a migration assistant that converts SAP Neo config files and application files to Cloud Foundry equivalents.

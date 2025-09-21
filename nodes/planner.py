@@ -8,7 +8,7 @@ from langchain_ollama import ChatOllama
 from langchain.schema import HumanMessage
 
 # Local LLM
-llm = ChatOllama(model="llama3")
+llm = ChatOllama(model="gpt-oss:120b")
 
 SYSTEM_INSTRUCTIONS = """
 You are an expert assistant that inspects a repository layout for an SAP Neo application and
