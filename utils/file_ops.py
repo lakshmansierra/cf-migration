@@ -36,13 +36,4 @@ def write_text_file(path: str, content: str) -> None:
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
 
-def find_files(root: str, names: List[str]) -> List[str]:
-    found = []
-    for r, _, files in os.walk(root):
-        for fn in files:
-            if fn in names:
-                found.append(os.path.join(r, fn))
-    return found
 
-def relpath_under(root: str, path: str) -> str:
-    return os.path.relpath(path, root)
