@@ -1,0 +1,368 @@
+
+
+### File: .\code_ext.py
+
+import os
+
+# extensions you want to include (e.g., only Python files)
+INCLUDE_EXTENSIONS = {".py"}
+
+# file to write everything into
+OUTPUT_FILE = "all_code.txt"
+
+# folders/files you don't want to include
+EXCLUDE_DIRS = {".git", "__pycache__", ".venv", "code_ext.py"}  
+EXCLUDE_FILES = {"__init__.py"}
+
+def collect_code(root="."):
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as out:
+        for foldername, subfolders, filenames in os.walk(root):
+            # skip excluded dirs
+            if any(ex in foldername for ex in EXCLUDE_DIRS):
+                continue
+
+            for filename in filenames:
+                if filename in EXCLUDE_FILES:
+                    continue
+                _, ext = os.path.splitext(filename)
+                if ext in INCLUDE_EXTENSIONS:
+                    filepath = os.path.join(foldername, filename)
+                    try:
+                        with open(filepath, "r", encoding="utf-8") as f:
+                            code = f.read()
+                        out.write(f"\n\n### File: {filepath}\n\n")
+                        out.write(code)
+                        out.write("\n" + "="*80 + "\n")  # separator
+                    except Exception as e:
+                        print(f"⚠️ Could not read {filepath}: {e}")
+    print(f"\n✅ All code collected into: {OUTPUT_FILE}")
+
+if __name__ == "__main__":
+    collect_code()
+
+================================================================================
+
+
+### File: .\graph.py
+
+# graph.py
+from typing import Dict, Any, TypedDict
+from langgraph.graph import StateGraph, END
+
+from utils.file_ops import prepare_output_dir
+from nodes.planner import plan_migration
+from nodes.transformer import transform_files
+from nodes.writer import write_output
+
+
+# Define state shape
+class MigrationState(TypedDict, total=False):
+    repo_path: str
+    output_path: str
+    plan: Dict[str, Any]
+    transformed_files: Dict[str, str]
+    written_files: Dict[str, str]
+
+
+# --- Node functions ---
+def planner_node(state: MigrationState) -> MigrationState:
+    plan = plan_migration(state["repo_path"])
+    state["plan"] = plan
+    return state
+
+
+def transformer_node(state: MigrationState) -> MigrationState:
+    transformed = transform_files(state["repo_path"], state["plan"])
+    state["transformed_files"] = transformed
+    return state
+
+
+def writer_node(state: MigrationState) -> MigrationState:
+    output_path = prepare_output_dir()
+    written = write_output(output_path, state["repo_path"], state["transformed_files"])
+    state["output_path"] = output_path
+    state["written_files"] = written
+    return state
+
+
+# --- Build graph ---
+workflow = StateGraph(MigrationState)
+
+workflow.add_node("planner", planner_node)
+workflow.add_node("transformer", transformer_node)
+workflow.add_node("writer", writer_node)
+
+workflow.set_entry_point("planner")
+workflow.add_edge("planner", "transformer")
+workflow.add_edge("transformer", "writer")
+workflow.add_edge("writer", END)
+
+# Compile the graph into an app
+migrator_app = workflow.compile()
+
+
+def run_migration(repo_path: str) -> Dict[str, Any]:
+    """Run the migration workflow."""
+    result = migrator_app.invoke({"repo_path": repo_path})
+    return result
+
+================================================================================
+
+
+### File: .\main.py
+
+# main.py
+import os
+from graph import run_migration
+from utils.file_ops import prepare_output_dir
+
+def main():
+    # Hardcoded source repo (Neo environment)
+    source_repo = r"C:\Users\LakshmanNavaneethakr\Downloads\Others\pra 1 1"
+    
+
+    if not os.path.exists(source_repo):
+        print("Source repo path does not exist:", source_repo)
+        return
+
+    # Hardcoded destination repo path (new CF-deployable repo)
+    # We create a new folder inside temp with prefix
+    dest_repo = prepare_output_dir(base_prefix="cf_repo_")
+    print("Source Neo repo:", source_repo)
+    print("Destination CF repo will be:", dest_repo)
+
+    # Run migration
+    result = run_migration(source_repo)
+
+    # The output path from the workflow will be a temp folder created by the writer
+    output_path = result.get("output_path", dest_repo)
+    print("\nMigration complete.")
+    print("Output CF-deployable folder:", output_path)
+    print("Files written/overwritten:")
+    for rel, path in result.get("written_files", {}).items():
+        print(" -", rel, "->", path)
+
+if __name__ == "__main__":
+    main()
+
+================================================================================
+
+
+### File: .\nodes\planner.py
+
+# nodes/planner.py
+import os
+import json
+from typing import Dict, Any, List
+from utils.file_ops import read_text_file
+
+from langchain_ollama import ChatOllama
+from langchain.schema import HumanMessage
+
+# Local LLM
+llm = ChatOllama(model="mistral:latest")
+
+SYSTEM_INSTRUCTIONS = """
+You are an expert assistant that inspects a repository layout for an SAP Neo application and
+produces a migration plan to run on Cloud Foundry.
+
+Input you'll receive (as JSON):
+- filenames: list of relative file paths (strings)
+- snippets: mapping of relpath -> file snippet (small text)
+Your output MUST be valid JSON of the form:
+{
+  "plan": [
+    {
+      "file": "<relative/path/to/file>",
+      "reason": "<short reason>",
+      "action": "<one of convert_manifest, remove_neo_route, convert_mta, convert_xsapp, copy_as_is, manual_review>",
+      "target": "<suggested target filename or null>"
+    },
+    ...
+  ]
+}
+Return only this JSON. If nothing to do, return {"plan": []}.
+"""
+
+def _gather(repo_root: str, max_files: int = 400, max_snippets: int = 50) -> Dict[str, Any]:
+    filenames: List[str] = []
+    snippets: Dict[str, str] = {}
+    for root, _, files in os.walk(repo_root):
+        for f in files:
+            filenames.append(os.path.relpath(os.path.join(root, f), repo_root))
+    filenames = sorted(filenames)[:max_files]
+
+    interesting = {"neo-app.json", "mta.yaml", "mta.yml", "xs-app.json", "xs-security.json", "manifest.yml", "package.json", "requirements.txt"}
+    count = 0
+    for rel in filenames:
+        base = os.path.basename(rel)
+        if base in interesting and count < max_snippets:
+            try:
+                snippets[rel] = read_text_file(os.path.join(repo_root, rel))[:4000]
+            except:
+                snippets[rel] = "<unreadable>"
+            count += 1
+    return {"filenames": filenames, "snippets": snippets}
+
+def plan_migration(repo_root: str) -> Dict[str, Any]:
+    payload = _gather(repo_root)
+    prompt_obj = {
+        "instructions": SYSTEM_INSTRUCTIONS,
+        "filenames": payload["filenames"],
+        "snippets": payload["snippets"]
+    }
+    prompt = json.dumps(prompt_obj, indent=2)
+
+    # Use ChatOllama directly
+    resp = llm.invoke([HumanMessage(content=prompt)])
+
+    # Try to parse JSON
+    try:
+        parsed = json.loads(resp)
+        if "plan" in parsed and isinstance(parsed["plan"], list):
+            return parsed
+    except Exception:
+        pass
+
+    return {"plan": []}
+
+================================================================================
+
+
+### File: .\nodes\transformer.py
+
+# nodes/transformer.py
+import os
+import json
+from typing import Dict, Any
+from utils.file_ops import read_text_file
+
+from langchain_ollama import ChatOllama
+from langchain.schema import HumanMessage
+
+llm = ChatOllama(model="mistral:latest")
+
+SYSTEM_PROMPT = """
+You are a migration assistant that converts SAP Neo config files and application files to Cloud Foundry equivalents.
+You will receive a JSON object containing:
+- file_name: relative path (string)
+- action: one of [convert_manifest, remove_neo_route, convert_mta, convert_xsapp, copy_as_is, manual_review]
+- file_content: the source file content (string)
+
+For actions that produce a new file (e.g. convert_manifest), return the converted file content only.
+For copy_as_is, return the original content unchanged.
+If you cannot convert, return a JSON object like {"error":"reason"}.
+ 
+Return only the transformed file content or the small error JSON.
+"""
+
+def transform_files(repo_root: str, plan: Dict[str, Any]) -> Dict[str, str]:
+    results: Dict[str, str] = {}
+    items = plan.get("plan", [])
+
+    for item in items:
+        rel = item.get("file")
+        action = item.get("action")
+        target = item.get("target") or rel
+        src_path = os.path.join(repo_root, rel)
+        if not os.path.exists(src_path):
+            results[target] = f"# MISSING SOURCE: {rel}\n"
+            continue
+        content = read_text_file(src_path)
+        payload = {
+            "file_name": rel,
+            "action": action,
+            "file_content": content,
+            "instructions": SYSTEM_PROMPT
+        }
+        prompt = json.dumps(payload, indent=2)
+
+        # Use ChatOllama directly
+        resp = llm.invoke([HumanMessage(content=prompt)])
+
+        results[target] = resp
+    return results
+
+================================================================================
+
+
+### File: .\nodes\writer.py
+
+# nodes/writer.py
+import os
+from typing import Dict
+from utils.file_ops import copy_repo_to_output, write_text_file
+
+def write_output(output_root: str, repo_root: str, transformed_files: Dict[str, str]) -> Dict[str, str]:
+    """
+    - Copy full repo to output_root
+    - Overwrite transformed files into the output_root paths
+    Returns mapping of written files.
+    """
+    # Step A: copy repo to output root
+    os.makedirs(output_root, exist_ok=True)
+    copy_repo_to_output(repo_root, output_root)
+
+    written = {}
+    for rel_target, content in transformed_files.items():
+        dest_path = os.path.join(output_root, rel_target)
+        write_text_file(dest_path, content)
+        written[rel_target] = dest_path
+
+    return written
+
+================================================================================
+
+
+### File: .\utils\file_ops.py
+
+# utils/file_ops.py
+import os
+import shutil
+import tempfile
+from typing import List
+
+def prepare_output_dir(base_prefix: str = "cf_migrated_") -> str:
+    """Create a temp output directory and return its path."""
+    return tempfile.mkdtemp(prefix=base_prefix)
+
+def copy_repo_to_output(src_repo_path: str, dest_output_path: str) -> None:
+    """
+    Copy entire repository into output folder (preserve structure).
+    """
+    if not os.path.exists(src_repo_path):
+        raise FileNotFoundError(f"Source repo path not found: {src_repo_path}")
+
+    # Copy content recursively
+    for root, dirs, files in os.walk(src_repo_path):
+        rel = os.path.relpath(root, src_repo_path)
+        dest_root = os.path.join(dest_output_path, rel) if rel != "." else dest_output_path
+        os.makedirs(dest_root, exist_ok=True)
+        for d in dirs:
+            os.makedirs(os.path.join(dest_root, d), exist_ok=True)
+        for f in files:
+            src_file = os.path.join(root, f)
+            dst_file = os.path.join(dest_root, f)
+            shutil.copy2(src_file, dst_file)
+
+def read_text_file(path: str) -> str:
+    with open(path, "r", encoding="utf-8", errors="ignore") as f:
+        return f.read()
+
+def write_text_file(path: str, content: str) -> None:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+def find_files(root: str, names: List[str]) -> List[str]:
+    found = []
+    for r, _, files in os.walk(root):
+        for fn in files:
+            if fn in names:
+                found.append(os.path.join(r, fn))
+    return found
+
+def relpath_under(root: str, path: str) -> str:
+    return os.path.relpath(path, root)
+
+================================================================================
