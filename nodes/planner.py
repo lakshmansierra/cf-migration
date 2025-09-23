@@ -1,4 +1,3 @@
-# nodes/planner.py
 import os
 import json
 from typing import Dict, Any, List
@@ -7,7 +6,6 @@ from utils.file_ops import read_text_file
 from langchain_ollama import ChatOllama
 from langchain.schema import HumanMessage
 
-# Local LLM
 llm = ChatOllama(model="mistral:latest")
 
 SYSTEM_INSTRUCTIONS = """
@@ -61,10 +59,8 @@ def plan_migration(repo_root: str) -> Dict[str, Any]:
     }
     prompt = json.dumps(prompt_obj, indent=2)
 
-    # Use ChatOllama directly
     resp = llm.invoke([HumanMessage(content=prompt)])
 
-    # Try to parse JSON
     try:
         parsed = json.loads(resp)
         if "plan" in parsed and isinstance(parsed["plan"], list):

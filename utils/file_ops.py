@@ -1,11 +1,8 @@
-# utils/file_ops.py
 import os
 import shutil
 import tempfile
-from typing import List
 
 def prepare_output_dir(base_prefix: str = "cf_migrated_") -> str:
-    """Create a temp output directory and return its path."""
     return tempfile.mkdtemp(prefix=base_prefix)
 
 def copy_repo_to_output(src_repo_path: str, dest_output_path: str) -> None:

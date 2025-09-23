@@ -1,4 +1,3 @@
-# graph.py
 from typing import Dict, Any, TypedDict
 from langgraph.graph import StateGraph, END
 
@@ -8,7 +7,7 @@ from nodes.transformer import transform_files
 from nodes.writer import write_output
 
 
-# Define state shape
+# state shape
 class MigrationState(TypedDict, total=False):
     repo_path: str
     output_path: str
@@ -17,7 +16,7 @@ class MigrationState(TypedDict, total=False):
     written_files: Dict[str, str]
 
 
-# --- Node functions ---
+# Node functions 
 def planner_node(state: MigrationState) -> MigrationState:
     plan = plan_migration(state["repo_path"])
     state["plan"] = plan
@@ -38,7 +37,7 @@ def writer_node(state: MigrationState) -> MigrationState:
     return state
 
 
-# --- Build graph ---
+# bulding graph 
 workflow = StateGraph(MigrationState)
 
 workflow.add_node("planner", planner_node)
@@ -50,11 +49,10 @@ workflow.add_edge("planner", "transformer")
 workflow.add_edge("transformer", "writer")
 workflow.add_edge("writer", END)
 
-# Compile the graph into an app
+
 migrator_app = workflow.compile()
 
 
 def run_migration(repo_path: str) -> Dict[str, Any]:
-    """Run the migration workflow."""
     result = migrator_app.invoke({"repo_path": repo_path})
     return result
