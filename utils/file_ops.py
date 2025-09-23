@@ -1,4 +1,5 @@
 import os
+import json
 import shutil
 import tempfile
 
@@ -33,4 +34,7 @@ def write_text_file(path: str, content: str) -> None:
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
 
-
+def save_dict_to_file(data: dict, file_path: str) -> None:
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
