@@ -37,7 +37,7 @@ def writer_node(state: MigrationState) -> MigrationState:
     return state
 
 
-# bulding graph 
+# building graph 
 workflow = StateGraph(MigrationState)
 
 workflow.add_node("planner", planner_node)
