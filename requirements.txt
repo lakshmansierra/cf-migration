@@ -31,3 +31,4 @@ xxhash==3.5.0
 zstandard==0.25.0
 
 sap-ai-sdk-gen==5.6.3
+black==25.9.0

@@ -57,6 +57,8 @@ def _gather(repo_root: str, max_files: int = 400, max_snippets: int = 50) -> Dic
             except:
                 snippets[rel] = "<unreadable>"
             count += 1
+    # filenames = all repo files (full list)
+    # snippets = only interesting files’ contents
     return {"filenames": filenames, "snippets": snippets}
 
 def plan_migration(repo_root: str) -> Dict[str, Any]:
