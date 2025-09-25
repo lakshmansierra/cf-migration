@@ -1,11 +1,9 @@
-# utils/file_ops.py
 import os
+import json
 import shutil
 import tempfile
-from typing import List
 
 def prepare_output_dir(base_prefix: str = "cf_migrated_") -> str:
-    """Create a temp output directory and return its path."""
     return tempfile.mkdtemp(prefix=base_prefix)
 
 def copy_repo_to_output(src_repo_path: str, dest_output_path: str) -> None:
@@ -36,4 +34,7 @@ def write_text_file(path: str, content: str) -> None:
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
 
-
+def save_dict_to_file(data: dict, file_path: str) -> None:
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)

@@ -1,8 +1,7 @@
-# nodes/transformer.py
 import os
 import json
 from typing import Dict, Any
-from utils.file_ops import read_text_file
+from utils.file_ops import read_text_file, save_dict_to_file
 
 from langchain_ollama import ChatOllama
 from langchain.schema import HumanMessage
@@ -44,8 +43,8 @@ def transform_files(repo_root: str, plan: Dict[str, Any]) -> Dict[str, str]:
         }
         prompt = json.dumps(payload, indent=2)
 
-        # Use ChatOllama directly
         resp = llm.invoke([HumanMessage(content=prompt)])
 
         results[target] = resp
+    save_dict_to_file(results, "transform_files_return.txt")
     return results

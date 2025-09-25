@@ -1,13 +1,11 @@
-# nodes/planner.py
 import os
 import json
 from typing import Dict, Any, List
-from utils.file_ops import read_text_file
+from utils.file_ops import read_text_file, save_dict_to_file
 
 from langchain_ollama import ChatOllama
 from langchain.schema import HumanMessage
 
-# Local LLM
 llm = ChatOllama(model="mistral:latest")
 
 SYSTEM_INSTRUCTIONS = """
@@ -40,20 +38,34 @@ def _gather(repo_root: str, max_files: int = 400, max_snippets: int = 50) -> Dic
             filenames.append(os.path.relpath(os.path.join(root, f), repo_root))
     filenames = sorted(filenames)[:max_files]
 
-    interesting = {"neo-app.json", "mta.yaml", "mta.yml", "xs-app.json", "xs-security.json", "manifest.yml", "package.json", "requirements.txt"}
+    interesting = {
+    "neo-app.json",
+    "mta.yaml",
+    "mta.yml",
+    "xs-security.json",
+    "manifest.yml",
+    "package.json"  # only if it's a Node.js project
+}
     count = 0
     for rel in filenames:
         base = os.path.basename(rel)
         if base in interesting and count < max_snippets:
             try:
-                snippets[rel] = read_text_file(os.path.join(repo_root, rel))[:4000]
+                # only reads interesting files, not all repo files, coz it is not language conversion
+                snippets[rel] = read_text_file(os.path.join(repo_root, rel))
+                # snippets[rel] = read_text_file(os.path.join(repo_root, rel))[:4000]
             except:
                 snippets[rel] = "<unreadable>"
             count += 1
+    # filenames = all repo files (full list)
+    # snippets = only interesting files’ contents
     return {"filenames": filenames, "snippets": snippets}
 
 def plan_migration(repo_root: str) -> Dict[str, Any]:
     payload = _gather(repo_root)
+
+    save_dict_to_file(payload, os.path.join(repo_root, "_gather_return.txt"))
+
     prompt_obj = {
         "instructions": SYSTEM_INSTRUCTIONS,
         "filenames": payload["filenames"],
@@ -61,13 +73,12 @@ def plan_migration(repo_root: str) -> Dict[str, Any]:
     }
     prompt = json.dumps(prompt_obj, indent=2)
 
-    # Use ChatOllama directly
     resp = llm.invoke([HumanMessage(content=prompt)])
 
-    # Try to parse JSON
     try:
         parsed = json.loads(resp)
         if "plan" in parsed and isinstance(parsed["plan"], list):
+            save_dict_to_file(parsed, "plan_migration_return.txt")  # save only valid plan
             return parsed
     except Exception:
         pass
