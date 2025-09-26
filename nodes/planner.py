@@ -3,11 +3,23 @@ import json
 from typing import Dict, Any, List
 from utils.file_ops import read_text_file, save_dict_to_file
 
-from langchain_ollama import ChatOllama
+from gen_ai_hub.proxy.native.google_vertexai.clients import GenerativeModel
 from langchain.schema import HumanMessage
+from ai_core_sdk.ai_core_v2_client import AICoreV2Client
 
-llm = ChatOllama(model="mistral:latest")
+# === SAP AI Core client setup ===
+AICORE_CLIENT = AICoreV2Client(
+    base_url="https://api.ai.prod.us-east-1.aws.ml.hana.ondemand.com/v2",  # ✅ base URL only
+    auth_url="https://gen-ai.authentication.us10.hana.ondemand.com/oauth/token",
+    client_id="sb-42a29a03-b2f4-47de-9a41-e0936be9aaf5!b256749|aicore!b164",
+    client_secret="b5e6caee-15aa-493a-a6ac-1fef0ab6e9fe$Satg7UGYPLsz5YYeXefHpbwTfEqqCkQEbasMDPGHAgU=",
+    resource_group="default",
+)
 
+LLM_DEPLOYMENT_ID = "dda84494ee46f575"
+MODEL_NAME = "gemini-2.5-pro"
+
+# === System instructions ===
 SYSTEM_INSTRUCTIONS = """
 You are an expert assistant that inspects a repository layout for an SAP Neo application and
 produces a migration plan to run on Cloud Foundry.
@@ -61,6 +73,22 @@ def _gather(repo_root: str, max_files: int = 400, max_snippets: int = 50) -> Dic
     # snippets = only interesting files’ contents
     return {"filenames": filenames, "snippets": snippets}
 
+# --- Call Gemini model ---
+def _call_sap_ai_core(prompt: str) -> str:
+    model = GenerativeModel(
+        deployment_id=LLM_DEPLOYMENT_ID,
+        model=MODEL_NAME,
+        aicore_proxy_client=AICORE_CLIENT,
+    )
+    message = HumanMessage(content=prompt)
+    response = model.generate_content([message])
+
+    if hasattr(response, "candidates") and response.candidates:
+        parts = response.candidates[0].content.parts
+        if parts and hasattr(parts[0], "text"):
+            return parts[0].text
+    return ""
+
 def plan_migration(repo_root: str) -> Dict[str, Any]:
     payload = _gather(repo_root)
 
@@ -73,8 +101,7 @@ def plan_migration(repo_root: str) -> Dict[str, Any]:
     }
     prompt = json.dumps(prompt_obj, indent=2)
 
-    resp = llm.invoke([HumanMessage(content=prompt)])
-
+    resp = _call_sap_ai_core(prompt)
     try:
         parsed = json.loads(resp)
         if "plan" in parsed and isinstance(parsed["plan"], list):
