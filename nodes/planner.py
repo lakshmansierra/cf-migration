@@ -1,23 +1,19 @@
 import os
 import json
+import requests
 from typing import Dict, Any, List
 from utils.file_ops import read_text_file, save_dict_to_file
 
-from gen_ai_hub.proxy.native.google_vertexai.clients import GenerativeModel
-from langchain.schema import HumanMessage
-from ai_core_sdk.ai_core_v2_client import AICoreV2Client
+from langchain.schema import HumanMessage  # kept for compatibility with existing prompt usage
 
-# === SAP AI Core client setup ===
-AICORE_CLIENT = AICoreV2Client(
-    base_url="https://api.ai.prod.us-east-1.aws.ml.hana.ondemand.com/v2",  # ✅ base URL only
-    auth_url="https://gen-ai.authentication.us10.hana.ondemand.com/oauth/token",
-    client_id="sb-42a29a03-b2f4-47de-9a41-e0936be9aaf5!b256749|aicore!b164",
-    client_secret="b5e6caee-15aa-493a-a6ac-1fef0ab6e9fe$Satg7UGYPLsz5YYeXefHpbwTfEqqCkQEbasMDPGHAgU=",
-    resource_group="default",
-)
+# === SAP AI Core Credentials and endpoints (from user) ===
+AICORE_AUTH_URL = "https://gen-ai.authentication.us10.hana.ondemand.com/"  # ensure trailing slash
+AICORE_CLIENT_ID = "sb-42a29a03-b2f4-47de-9a41-e0936be9aaf5!b256749|aicore!b164"
+AICORE_CLIENT_SECRET = "b5e6caee-15aa-493a-a6ac-1fef0ab6e9fe$Satg7UGYPLsz5YYeXefHpbwTfEqqCkQEbasMDPGHAgU="
+AICORE_RESOURCE_GROUP = "default"
 
-LLM_DEPLOYMENT_ID = "dda84494ee46f575"
-MODEL_NAME = "gemini-2.5-pro"
+# Replace with the deployment URL you provided (quoted string)
+DEPLOYMENT_URL = "https://api.ai.prod.us-east-1.aws.ml.hana.ondemand.com/v2/inference/deployments/d6d36c0e481318cf/models/gemini-1.5-flash:generateContent%22"
 
 # === System instructions ===
 SYSTEM_INSTRUCTIONS = """
@@ -51,47 +47,119 @@ def _gather(repo_root: str, max_files: int = 400, max_snippets: int = 50) -> Dic
     filenames = sorted(filenames)[:max_files]
 
     interesting = {
-    "neo-app.json",
-    "mta.yaml",
-    "mta.yml",
-    "xs-security.json",
-    "manifest.yml",
-    "package.json"  # only if it's a Node.js project
-}
+        "neo-app.json",
+        "mta.yaml",
+        "mta.yml",
+        "xs-security.json",
+        "manifest.yml",
+        "package.json"  # only if it's a Node.js project
+    }
     count = 0
     for rel in filenames:
         base = os.path.basename(rel)
         if base in interesting and count < max_snippets:
             try:
-                # only reads interesting files, not all repo files, coz it is not language conversion
                 snippets[rel] = read_text_file(os.path.join(repo_root, rel))
-                # snippets[rel] = read_text_file(os.path.join(repo_root, rel))[:4000]
             except:
                 snippets[rel] = "<unreadable>"
             count += 1
-    # filenames = all repo files (full list)
-    # snippets = only interesting files’ contents
-    return {"filenames": filenames, "snippets": snippets}
+    # print(snippets,"&&&&&")      
+    x = {"filenames": filenames, "snippets": snippets}
+    print(x)  
+    return x
 
-# --- Call Gemini model ---
-def _call_sap_ai_core(prompt: str) -> str:
-    model = GenerativeModel(
-        deployment_id=LLM_DEPLOYMENT_ID,
-        model=MODEL_NAME,
-        aicore_proxy_client=AICORE_CLIENT,
+# --- Authenticate and call SAP AI Core deployment via HTTP ---
+def _get_access_token() -> str:
+    token_url = AICORE_AUTH_URL.rstrip("/") + "/oauth/token"
+    resp = requests.post(
+        token_url,
+        data={"grant_type": "client_credentials"},
+        auth=(AICORE_CLIENT_ID, AICORE_CLIENT_SECRET),
+        timeout=30,
     )
-    message = HumanMessage(content=prompt)
-    response = model.generate_content([message])
+    resp.raise_for_status()
+    data = resp.json()
+    return data.get("access_token")
 
-    if hasattr(response, "candidates") and response.candidates:
-        parts = response.candidates[0].content.parts
-        if parts and hasattr(parts[0], "text"):
-            return parts[0].text
-    return ""
+def _call_sap_ai_core(prompt: str) -> str:
+    """
+    Authenticate with SAP AI Core using client credentials and call the given deployment URL.
+    Returns the best-effort extracted text from the model response.
+    """
+    try:
+        token = _get_access_token()
+    except Exception as e:
+        return json.dumps({"error": f"auth_failed: {str(e)}"})
+
+    headers = {
+        "AI-Resource-Group": AICORE_RESOURCE_GROUP,
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
+    }
+
+    # Minimal generic payload — adjust if your deployment expects a different schema.
+    payload = {
+        "input": prompt
+    }
+
+    try:
+        r = requests.post(DEPLOYMENT_URL, headers=headers, json=payload, timeout=120)
+        r.raise_for_status()
+        resp_json = r.json()
+    except Exception as e:
+        return json.dumps({"error": f"inference_call_failed: {str(e)}"})
+
+    # Try to extract common response shapes:
+    # - { "candidates": [ { "content": { "parts": [{"text": "..." }] } } ] }
+    # - { "outputs": [{"content": {"text": "..."}}] }
+    # - { "predictions" / "result" / raw text }
+    try:
+        # path 1: candidates -> content -> parts -> text
+        if isinstance(resp_json, dict) and "candidates" in resp_json:
+            c0 = resp_json["candidates"][0]
+            # drill down
+            text = None
+            if isinstance(c0, dict):
+                content = c0.get("content", {})
+                parts = content.get("parts") or content.get("textParts")
+                if isinstance(parts, list) and parts:
+                    p = parts[0]
+                    if isinstance(p, dict) and "text" in p:
+                        text = p["text"]
+                    elif isinstance(p, str):
+                        text = p
+                elif isinstance(content, dict) and "text" in content:
+                    text = content["text"]
+            if text:
+                return text
+
+        # path 2: outputs list
+        if isinstance(resp_json, dict) and "outputs" in resp_json:
+            outputs = resp_json["outputs"]
+            if isinstance(outputs, list) and outputs:
+                o = outputs[0]
+                if isinstance(o, dict) and "content" in o:
+                    cont = o["content"]
+                    if isinstance(cont, dict) and "text" in cont:
+                        return cont["text"]
+                    # sometimes content may be a flat string
+                    if isinstance(cont, str):
+                        return cont
+
+        # path 3: direct text fields
+        for key in ("text", "result", "prediction", "output"):
+            if isinstance(resp_json, dict) and key in resp_json:
+                v = resp_json[key]
+                if isinstance(v, str):
+                    return v
+
+        # fallback: return a compact JSON string (so caller can parse)
+        return json.dumps(resp_json)
+    except Exception:
+        return json.dumps(resp_json)
 
 def plan_migration(repo_root: str) -> Dict[str, Any]:
     payload = _gather(repo_root)
-
     save_dict_to_file(payload, os.path.join(repo_root, "_gather_return.txt"))
 
     prompt_obj = {
@@ -103,7 +171,7 @@ def plan_migration(repo_root: str) -> Dict[str, Any]:
 
     resp = _call_sap_ai_core(prompt)
     try:
-        parsed = json.loads(resp)
+        parsed = json.loads(resp) if isinstance(resp, str) else resp
         if "plan" in parsed and isinstance(parsed["plan"], list):
             save_dict_to_file(parsed, "plan_migration_return.txt")  # save only valid plan
             return parsed

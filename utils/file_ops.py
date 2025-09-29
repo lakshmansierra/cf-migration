@@ -2,6 +2,8 @@ import os
 import json
 import shutil
 import tempfile
+from typing import Any, Dict
+
 
 def prepare_output_dir(base_prefix: str = "cf_migrated_") -> str:
     return tempfile.mkdtemp(prefix=base_prefix)
@@ -34,7 +36,15 @@ def write_text_file(path: str, content: str) -> None:
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
 
-def save_dict_to_file(data: dict, file_path: str) -> None:
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+def save_dict_to_file(data: Dict[str, Any], file_path: str) -> None:
+    """
+    Save a dictionary to JSON file. Create parent dir only if needed.
+    """
+    # Ensure directory exists only if file_path contains a directory part
+    parent_dir = os.path.dirname(file_path)
+    if parent_dir:
+        os.makedirs(parent_dir, exist_ok=True)
+
+    # Write JSON atomically (optional: simple implementation)
     with open(file_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+        json.dump(data, f, indent=2, ensure_ascii=False)

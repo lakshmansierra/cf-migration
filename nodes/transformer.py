@@ -1,25 +1,19 @@
 import os
 import json
+import requests
 from typing import Dict, Any
 from utils.file_ops import read_text_file, save_dict_to_file
 
-from gen_ai_hub.proxy.native.google_vertexai.clients import GenerativeModel
-from langchain.schema import HumanMessage
-from ai_core_sdk.ai_core_v2_client import AICoreV2Client
+from langchain.schema import HumanMessage  # kept for compatibility if you build prompts similarly
 
-# === Hardcoded SAP AI Core client ===
-AICORE_CLIENT = AICoreV2Client(
-    base_url="https://api.ai.prod.us-east-1.aws.ml.hana.ondemand.com/v2",  # ✅ only base URL
-    auth_url="https://gen-ai.authentication.us10.hana.ondemand.com/oauth/token",
-    client_id="sb-42a29a03-b2f4-47de-9a41-e0936be9aaf5!b256749|aicore!b164",
-    client_secret="b5e6caee-15aa-493a-a6ac-1fef0ab6e9fe$Satg7UGYPLsz5YYeXefHpbwTfEqqCkQEbasMDPGHAgU=",
-    resource_group="default",
-)
+# === SAP AI Core Credentials and endpoints (from user) ===
+AICORE_AUTH_URL = "https://gen-ai.authentication.us10.hana.ondemand.com/"  # ensure trailing slash
+AICORE_CLIENT_ID = "sb-42a29a03-b2f4-47de-9a41-e0936be9aaf5!b256749|aicore!b164"
+AICORE_CLIENT_SECRET = "b5e6caee-15aa-493a-a6ac-1fef0ab6e9fe$Satg7UGYPLsz5YYeXefHpbwTfEqqCkQEbasMDPGHAgU="
+AICORE_RESOURCE_GROUP = "default"
 
-LLM_DEPLOYMENT_ID = "dda84494ee46f575"
-MODEL_NAME = "gemini-2.5-pro"
+DEPLOYMENT_URL = "https://api.ai.prod.us-east-1.aws.ml.hana.ondemand.com/v2/inference/deployments/d6d36c0e481318cf/models/gemini-1.5-flash:generateContent%22"
 
-# === System prompt ===
 SYSTEM_PROMPT = """
 You are a migration assistant that converts SAP Neo config files and application files to Cloud Foundry equivalents.
 You will receive a JSON object containing:
@@ -30,25 +24,79 @@ You will receive a JSON object containing:
 For actions that produce a new file (e.g. convert_manifest), return the converted file content only.
 For copy_as_is, return the original content unchanged.
 If you cannot convert, return a JSON object like {"error":"reason"}.
- 
+
 Return only the transformed file content or the small error JSON.
 """
 
-# --- Call Gemini on SAP AI Core ---
-def _call_sap_ai_core(prompt: str) -> str:
-    model = GenerativeModel(
-        deployment_id=LLM_DEPLOYMENT_ID,
-        model=MODEL_NAME,
-        aicore_proxy_client=AICORE_CLIENT,
+def _get_access_token() -> str:
+    token_url = AICORE_AUTH_URL.rstrip("/") + "/oauth/token"
+    resp = requests.post(
+        token_url,
+        data={"grant_type": "client_credentials"},
+        auth=(AICORE_CLIENT_ID, AICORE_CLIENT_SECRET),
+        timeout=30,
     )
-    message = HumanMessage(content=prompt)
-    response = model.generate_content([message])
+    resp.raise_for_status()
+    data = resp.json()
+    return data.get("access_token")
 
-    if hasattr(response, "candidates") and response.candidates:
-        parts = response.candidates[0].content.parts
-        if parts and hasattr(parts[0], "text"):
-            return parts[0].text
-    return ""
+def _call_sap_ai_core(prompt: str) -> str:
+    try:
+        token = _get_access_token()
+    except Exception as e:
+        return json.dumps({"error": f"auth_failed: {str(e)}"})
+
+    headers = {
+        "AI-Resource-Group": AICORE_RESOURCE_GROUP,
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
+    }
+
+    payload = {
+        "input": prompt
+    }
+
+    try:
+        r = requests.post(DEPLOYMENT_URL, headers=headers, json=payload, timeout=120)
+        r.raise_for_status()
+        resp_json = r.json()
+    except Exception as e:
+        return json.dumps({"error": f"inference_call_failed: {str(e)}"})
+
+    # best-effort extraction (same logic as planner)
+    try:
+        if isinstance(resp_json, dict) and "candidates" in resp_json:
+            c0 = resp_json["candidates"][0]
+            content = c0.get("content", {})
+            parts = content.get("parts") or content.get("textParts")
+            if isinstance(parts, list) and parts:
+                p = parts[0]
+                if isinstance(p, dict) and "text" in p:
+                    return p["text"]
+                elif isinstance(p, str):
+                    return p
+            if isinstance(content, dict) and "text" in content:
+                return content["text"]
+
+        if isinstance(resp_json, dict) and "outputs" in resp_json:
+            outputs = resp_json["outputs"]
+            if isinstance(outputs, list) and outputs:
+                o = outputs[0]
+                cont = o.get("content")
+                if isinstance(cont, dict) and "text" in cont:
+                    return cont["text"]
+                if isinstance(cont, str):
+                    return cont
+
+        for key in ("text", "result", "prediction", "output"):
+            if isinstance(resp_json, dict) and key in resp_json:
+                v = resp_json[key]
+                if isinstance(v, str):
+                    return v
+
+        return json.dumps(resp_json)
+    except Exception:
+        return json.dumps(resp_json)
 
 # --- Transform files based on migration plan ---
 def transform_files(repo_root: str, plan: Dict[str, Any]) -> Dict[str, str]:
@@ -73,7 +121,7 @@ def transform_files(repo_root: str, plan: Dict[str, Any]) -> Dict[str, str]:
         prompt = json.dumps(payload, indent=2)
 
         resp = _call_sap_ai_core(prompt)
-
         results[target] = resp
+
     save_dict_to_file(results, "transform_files_return.txt")
     return results
