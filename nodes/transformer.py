@@ -53,24 +53,23 @@ def transform_files(repo_root: str, plan: Dict[str, Any], app_name: str) -> Dict
     items = plan.get("plan", [])
 
     for item in items:
-        rel = item.get("file")
-        action = item.get("action")
-        target = item.get("target") or rel
-        src_path = os.path.join(repo_root, rel)
+        src_rel = item["file"]
+        target_rel = item["target"]
+        action = item["action"]
+        src_path = os.path.join(repo_root, src_rel)
 
         if not os.path.exists(src_path):
-            results[target] = f"# MISSING SOURCE: {rel}\n"
+            results[target_rel] = f"# MISSING SOURCE: {src_rel}\n"
             continue
 
         content = read_text_file(src_path)
         payload = json.dumps({
-            "file_name": rel,
+            "file_name": src_rel,
             "action": action,
             "file_content": content,
             "app_name": app_name
         }, indent=2)
 
-        # ✅ Use ChatOpenAI wrapper
         messages = [
             SystemMessage(content=SYSTEM_PROMPT),
             HumanMessage(content=payload)
@@ -80,10 +79,11 @@ def transform_files(repo_root: str, plan: Dict[str, Any], app_name: str) -> Dict
         except Exception as e:
             transformed_content = json.dumps({"error": f"llm_call_failed: {str(e)}"})
 
-        results[target] = transformed_content
+        results[target_rel] = transformed_content
 
-    save_dict_to_file(results, "transform_files_return.txt")
+    save_dict_to_file(results, os.path.join(repo_root, "transform_files_return.json"))
     return results
+
 def save_transformed_files(transformed: Dict[str, str], output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
     for rel_path, content in transformed.items():
@@ -91,4 +91,3 @@ def save_transformed_files(transformed: Dict[str, str], output_dir: str):
         os.makedirs(os.path.dirname(out_path), exist_ok=True)
         with open(out_path, "w", encoding="utf-8") as f:
             f.write(content)
-

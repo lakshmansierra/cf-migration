@@ -89,26 +89,42 @@ def call_llm(prompt: str) -> str:
 # ------------------------
 def plan_migration(repo_root: str) -> Tuple[dict, dict]:
     filenames, snippets = gather_repo_files(repo_root)
-    repo_json = {"filenames": filenames, "snippets": snippets}
-    prompt = json.dumps(repo_json, indent=2)
+    plan_items = []
 
-    plan_text = call_llm(prompt)
+    app_name = "my_app"  # Ideally derived from neo-app.json
 
-    # --- Clean and parse JSON from model output ---
-    try:
-        # Try to extract only the JSON portion if extra text is around it
-        match = re.search(r'\{[\s\S]*\}', plan_text)
-        if match:
-            cleaned_json = match.group(0)
+    for f in filenames:
+        # Default target is same as source unless mapped
+        target = f
+        action = "manual_review"
+
+        if f.endswith("neo-app.json"):
+            target = f"app/xs-app.json"
+            action = "convert_xsapp"
+        elif f.endswith("manifest.json"):
+            target = f"app/manifest.json"
+            action = "convert_manifest"
+        elif "controller" in f:
+            target = f"app/controller/{os.path.basename(f)}"
+            action = "convert_ui5"
+        elif "view" in f:
+            target = f"app/view/{os.path.basename(f)}"
+            action = "convert_ui5"
+        elif "i18n" in f:
+            target = f"app/resources/i18n/{os.path.basename(f)}"
+            action = "copy_as_is"
         else:
-            cleaned_json = plan_text
+            target = f"app/{f}"
+            action = "manual_review"
 
-        plan = json.loads(cleaned_json)
-    except Exception as e:
-        plan = {"error": "failed_to_parse_plan", "raw": plan_text}
-        print(f"⚠️ Failed to parse model response: {e}")
+        plan_items.append({
+            "file": f,
+            "reason": f"Detected by pattern for CF migration",
+            "action": action,
+            "snippets": snippets.get(f, "")[:200],
+            "target": target
+        })
 
-    # Save output for debugging
+    plan = {"plan": plan_items}
     save_dict_to_file(plan, os.path.join(repo_root, "plan_migration.json"))
-
     return plan, snippets
