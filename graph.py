@@ -6,7 +6,6 @@ from nodes.planner import plan_migration
 from nodes.transformer import transform_files
 from nodes.writer import write_output
 
-
 # state shape
 class MigrationState(TypedDict, total=False):
     repo_path: str
@@ -18,21 +17,26 @@ class MigrationState(TypedDict, total=False):
 
 # Node functions 
 def planner_node(state: MigrationState) -> MigrationState:
-    plan = plan_migration(state["repo_path"])
+    # Ensure output_path exists and store in state
+    if "output_path" not in state or not state["output_path"]:
+        state["output_path"] = prepare_output_dir()
+
+    plan, snippets = plan_migration(state["repo_path"], state["output_path"])
     state["plan"] = plan
     return state
 
 
 def transformer_node(state: MigrationState) -> MigrationState:
-    transformed = transform_files(state["repo_path"], state["plan"])
+    # Pass output_path to avoid saving files in invalid locations
+    transformed = transform_files(state["repo_path"], state["plan"], state["output_path"])
     state["transformed_files"] = transformed
     return state
 
 
 def writer_node(state: MigrationState) -> MigrationState:
-    output_path = prepare_output_dir()
+    # use existing output_path from state
+    output_path = state.get("output_path") or prepare_output_dir()
     written = write_output(output_path, state["repo_path"], state["transformed_files"])
-    state["output_path"] = output_path
     state["written_files"] = written
     return state
 
@@ -48,7 +52,6 @@ workflow.set_entry_point("planner")
 workflow.add_edge("planner", "transformer")
 workflow.add_edge("transformer", "writer")
 workflow.add_edge("writer", END)
-
 
 migrator_app = workflow.compile()
 

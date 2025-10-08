@@ -1,86 +1,120 @@
 import os
 import json
-from typing import Dict, Any, List
+import re
+from typing import Dict, Tuple, List
+from gen_ai_hub.proxy.langchain.openai import ChatOpenAI
+from langchain.schema import HumanMessage, SystemMessage
 from utils.file_ops import read_text_file, save_dict_to_file
+from dotenv import load_dotenv
+from typing import Any, Dict, Tuple, List
 
-from langchain_ollama import ChatOllama
-from langchain.schema import HumanMessage
+# -----------------------------
+# Load environment variables
+# -----------------------------
+load_dotenv()  # loads values from .env into os.environ
 
-llm = ChatOllama(model="mistral:latest")
+# -----------------------------
+# SAP AI Core LLM setup
+# -----------------------------
+LLM_DEPLOYMENT_ID = os.environ["LLM_DEPLOYMENT_ID"]
+llm = ChatOpenAI(
+    deployment_id=LLM_DEPLOYMENT_ID,
+    temperature=0,
+    base_url=os.environ["AICORE_BASE_URL"]
+)
 
+# -----------------------------
+# System instructions for planner
+# -----------------------------
 SYSTEM_INSTRUCTIONS = """
-You are an expert assistant that inspects a repository layout for an SAP Neo application and
-produces a migration plan to run on Cloud Foundry.
+You are an expert assistant that inspects a repository layout for an SAP Neo application 
+and produces a migration plan to run on Cloud Foundry.
+
+Your tasks:
+1. Decide which files are relevant for migration.
+2. For each relevant file, suggest an action:
+   - convert_manifest
+   - remove_neo_route
+   - convert_mta
+   - convert_xsapp
+   - copy_as_is
+   - manual_review
+3. Provide a short reason for each action.
+4. Suggest a target filename if applicable, or null.
 
 Input you'll receive (as JSON):
-- filenames: list of relative file paths (strings)
-- snippets: mapping of relpath -> file snippet (small text)
-Your output MUST be valid JSON of the form:
+* filenames: list of relative file paths
+* snippets: mapping of relpath -> small snippet of file content
+
+Your output MUST be valid JSON in the form:
 {
   "plan": [
     {
       "file": "<relative/path/to/file>",
       "reason": "<short reason>",
       "action": "<one of convert_manifest, remove_neo_route, convert_mta, convert_xsapp, copy_as_is, manual_review>",
-      "target": "<suggested target filename or null>"
-    },
-    ...
+      "target": "<suggested target filename or null>",
+      "snippet": "<inside file codes(read)>"
+    }
   ]
 }
-Return only this JSON. If nothing to do, return {"plan": []}.
+Return only this JSON. If no files are relevant, return {"plan": []}.
 """
 
-def _gather(repo_root: str, max_files: int = 400, max_snippets: int = 50) -> Dict[str, Any]:
+# -----------------------------
+# Helper function: gather repo files
+# -----------------------------
+def gather_repo_files(repo_root: str, max_files: int = 400, max_snippets: int = 50) -> Dict[str, Any]:
     filenames: List[str] = []
     snippets: Dict[str, str] = {}
+
     for root, _, files in os.walk(repo_root):
         for f in files:
             filenames.append(os.path.relpath(os.path.join(root, f), repo_root))
     filenames = sorted(filenames)[:max_files]
 
-    interesting = {
-    "neo-app.json",
-    "mta.yaml",
-    "mta.yml",
-    "xs-security.json",
-    "manifest.yml",
-    "package.json"  # only if it's a Node.js project
-}
+    interesting_files = {"neo-app.json", "mta.yaml", "mta.yml", "xs-security.json", "manifest.yml", "package.json"}
     count = 0
     for rel in filenames:
-        base = os.path.basename(rel)
-        if base in interesting and count < max_snippets:
+        if os.path.basename(rel) in interesting_files and count < max_snippets:
             try:
-                # only reads interesting files, not all repo files, coz it is not language conversion
                 snippets[rel] = read_text_file(os.path.join(repo_root, rel))
-                # snippets[rel] = read_text_file(os.path.join(repo_root, rel))[:4000]
-            except:
+            except Exception:
                 snippets[rel] = "<unreadable>"
             count += 1
-    # filenames = all repo files (full list)
-    # snippets = only interesting files’ contents
+
     return {"filenames": filenames, "snippets": snippets}
 
-def plan_migration(repo_root: str) -> Dict[str, Any]:
-    payload = _gather(repo_root)
+# -----------------------------
+# Planner: call SAP AI Core LLM
+# -----------------------------
+def plan_migration(repo_root: str, output_dir: str) -> Tuple[Dict[str, Any], Dict[str, str]]:
+    payload = gather_repo_files(repo_root)
 
-    save_dict_to_file(payload, os.path.join(repo_root, "_gather_return.txt"))
+    # Save gathered files for debugging
+    save_dict_to_file(payload, os.path.join(output_dir, "_gather_return.json"))
 
-    prompt_obj = {
-        "instructions": SYSTEM_INSTRUCTIONS,
-        "filenames": payload["filenames"],
-        "snippets": payload["snippets"]
-    }
-    prompt = json.dumps(prompt_obj, indent=2)
-
-    resp = llm.invoke([HumanMessage(content=prompt)])
+    prompt_content = json.dumps(payload, indent=2)
+    messages = [
+        SystemMessage(content=SYSTEM_INSTRUCTIONS),
+        HumanMessage(content=prompt_content)
+    ]
 
     try:
-        parsed = json.loads(resp)
-        if "plan" in parsed and isinstance(parsed["plan"], list):
-            save_dict_to_file(parsed, "plan_migration_return.txt")  # save only valid plan
-            return parsed
-    except Exception:
-        pass
+        response = llm.invoke(messages)
+        plan_text = response.content
+    except Exception as e:
+        plan_text = json.dumps({"error": f"llm_call_failed: {str(e)}"})
 
-    return {"plan": []}
+    # Extract JSON from LLM output
+    try:
+        match = re.search(r'\{[\s\S]*\}', plan_text)
+        cleaned_json = match.group(0) if match else plan_text
+        plan = json.loads(cleaned_json)
+    except Exception as e:
+        plan = {"error": "failed_to_parse_plan", "raw": plan_text}
+        print(f"⚠️ Failed to parse model response: {e}")
+
+    # Save migration plan
+    save_dict_to_file(plan, os.path.join(output_dir, "plan_migration.json"))
+    return plan, payload.get("snippets", {})

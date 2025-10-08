@@ -3,7 +3,7 @@ from graph import run_migration
 from utils.file_ops import prepare_output_dir
 
 def main():
-    source_repo = r"C:\Users\LakshmanNavaneethakr\Downloads\Others\pra 1 1"
+    source_repo = r"C:\Users\Mounika.K\Downloads\pra 1 1"
     
     if not os.path.exists(source_repo):
         print("Source repo path does not exist:", source_repo)
