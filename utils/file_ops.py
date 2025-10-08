@@ -4,16 +4,14 @@ import shutil
 import tempfile
 
 def prepare_output_dir(base_prefix: str = "cf_migrated_") -> str:
-    return tempfile.mkdtemp(prefix=base_prefix)
+    path = tempfile.mkdtemp(prefix=base_prefix)
+    print(f"[INFO] Created output directory: {path}")
+    return path
 
 def copy_repo_to_output(src_repo_path: str, dest_output_path: str) -> None:
-    """
-    Copy entire repository into output folder (preserve structure).
-    """
     if not os.path.exists(src_repo_path):
         raise FileNotFoundError(f"Source repo path not found: {src_repo_path}")
 
-    # Copy content recursively
     for root, dirs, files in os.walk(src_repo_path):
         rel = os.path.relpath(root, src_repo_path)
         dest_root = os.path.join(dest_output_path, rel) if rel != "." else dest_output_path
@@ -21,9 +19,7 @@ def copy_repo_to_output(src_repo_path: str, dest_output_path: str) -> None:
         for d in dirs:
             os.makedirs(os.path.join(dest_root, d), exist_ok=True)
         for f in files:
-            src_file = os.path.join(root, f)
-            dst_file = os.path.join(dest_root, f)
-            shutil.copy2(src_file, dst_file)
+            shutil.copy2(os.path.join(root, f), os.path.join(dest_root, f))
 
 def read_text_file(path: str) -> str:
     with open(path, "r", encoding="utf-8", errors="ignore") as f:

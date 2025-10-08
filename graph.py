@@ -1,12 +1,10 @@
 from typing import Dict, Any, TypedDict
 from langgraph.graph import StateGraph, END
-
 from utils.file_ops import prepare_output_dir
 from nodes.planner import plan_migration
 from nodes.transformer import transform_files
 from nodes.writer import write_output
 
-# state shape
 class MigrationState(TypedDict, total=False):
     repo_path: str
     output_path: str
@@ -14,40 +12,32 @@ class MigrationState(TypedDict, total=False):
     transformed_files: Dict[str, str]
     written_files: Dict[str, str]
 
-
-# Node functions 
 def planner_node(state: MigrationState) -> MigrationState:
-    # Ensure output_path exists and store in state
+    print(" Planning migration...")
+    # Use existing output_path from main.py, or create one if missing
     if "output_path" not in state or not state["output_path"]:
         state["output_path"] = prepare_output_dir()
-
+    
     plan, snippets = plan_migration(state["repo_path"], state["output_path"])
     state["plan"] = plan
     return state
 
-
 def transformer_node(state: MigrationState) -> MigrationState:
-    # Pass output_path to avoid saving files in invalid locations
+    print(" Transforming files based on migration plan...")
     transformed = transform_files(state["repo_path"], state["plan"], state["output_path"])
     state["transformed_files"] = transformed
     return state
 
-
 def writer_node(state: MigrationState) -> MigrationState:
-    # use existing output_path from state
-    output_path = state.get("output_path") or prepare_output_dir()
-    written = write_output(output_path, state["repo_path"], state["transformed_files"])
+    print(" Writing transformed files to destination folder...")
+    written = write_output(state["output_path"], state["repo_path"], state["transformed_files"])
     state["written_files"] = written
     return state
 
-
-# building graph 
 workflow = StateGraph(MigrationState)
-
 workflow.add_node("planner", planner_node)
 workflow.add_node("transformer", transformer_node)
 workflow.add_node("writer", writer_node)
-
 workflow.set_entry_point("planner")
 workflow.add_edge("planner", "transformer")
 workflow.add_edge("transformer", "writer")
@@ -55,7 +45,10 @@ workflow.add_edge("writer", END)
 
 migrator_app = workflow.compile()
 
-
-def run_migration(repo_path: str) -> Dict[str, Any]:
-    result = migrator_app.invoke({"repo_path": repo_path})
+def run_migration(repo_path: str, output_path: str = None) -> Dict[str, Any]:
+    state = {"repo_path": repo_path}
+    if output_path:
+        state["output_path"] = output_path
+    result = migrator_app.invoke(state)
+    print(" Migration workflow complete.\n")
     return result
