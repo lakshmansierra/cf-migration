@@ -1,0 +1,180 @@
+{
+  "plan": [
+    {
+      "file": "neo-app.json",
+      "reason": "Neo routing must be replaced with CF approuter configuration. Routes and destinations need to be migrated to xs-app.json and managed approuter.",
+      "action": "convert_xsapp",
+      "snippets": "{\n  \"welcomeFile\": \"/index.html\",\n  \"routes\": [\n    {\n      \"path\": \"/resources\",\n      \"target\": {\n        \"type\": \"service\",\n        \"name\": \"sapui5\",\n        \"entryPath\": \"/resources\"\n      },\n      \"description\": \"SAPUI5 Resources\"\n    },\n    ...\n  ],\n  \"sendWelcomeFileRedirect\": true\n}",
+      "target": "xs-app.json"
+    },
+    {
+      "file": "manifest.json",
+      "reason": "UI5 app manifest must be reviewed for CF compatibility. DataSources and destinations need to be mapped to CF destinations. Ensure 'uri' points to a destination in CF and not a direct backend path.",
+      "action": "convert_manifest",
+      "snippets": "{\n    \"_version\": \"1.12.0\",\n    \"sap.app\": {\n        \"id\": \"sierra.pra.PRA_Custom\",\n        ...\n        \"dataSources\": {\n            \"ZPRA_REVENUE_SRV_01\": {\n                \"uri\": \"/sap/opu/odata/sap/ZPRA_REVENUE_SRV_01/\",\n                \"type\": \"OData\",\n                \"settings\": {\n                    \"localUri\": \"localService/metadata.xml\"\n                }\n            }\n        }\n    },\n    ...\n}",
+      "target": "webapp/manifest.json"
+    },
+    {
+      "file": "index.html",
+      "reason": "Entry point for UI5 app. Needs to be placed in HTML5 Application Repository for CF. Ensure resource paths and bootstrap are compatible with CF deployment.",
+      "action": "convert_ui5",
+      "snippets": "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"utf-8\">\n\t    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>PRA_Custom</title>\n\t\t<script id=\"sap-ui-bootstrap\"\n\t\t\tsrc=\"resources/sap-ui-core.js\"\n\t\t\tdata-sap-ui-theme=\"sap_fiori_3\"\n\t\t\tdata-sap-ui-resourceroots='{\"sierra.pra.PRA_Custom\": \"./\"}'\n\t\t\tdata-sap-ui-compatVersion=\"edge\"\n\t\t\tdata-sap-ui-oninit=\"module:sap/ui/core/ComponentSupport\"\n\t\t\tdata-sap-ui-async=\"true\"\n\t\t\tdata-sap-ui-frameOptions=\"trusted\">\n\t\t</script>\n\t</head>\n\t<body class=\"sapUiBody\">\n\t\t<div data-sap-ui-component data-name=\"sierra.pra.PRA_Custom\" data-id=\"container\" data-settings='{\"id\" : \"PRA_Custom\"}'></div>\n\t</body>\n</html>",
+      "target": "webapp/index.html"
+    },
+    {
+      "file": "manifest-bundle.zip",
+      "reason": "UI5 manifest bundle for i18n and manifest. Should be unpacked and placed in HTML5 Application Repository structure.",
+      "action": "manual_review",
+      "snippets": "PK\u0003\u0004\u0014\u0000\u0000\b\b\u0000r;Uyx ...",
+      "target": "webapp/"
+    },
+    {
+      "file": "Component.js",
+      "reason": "Main UI5 component. Should be placed in webapp/ for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "sap.ui.define([\"sap/ui/core/UIComponent\",\"sap/ui/Device\",\"sierra/pra/PRA_Custom/model/models\"],function(t,e,a){\"use strict\";return t.extend(\"sierra.pra.PRA_Custom.Component\",{metadata:{manifest:\"json\"},init:function(){t.prototype.init.apply(this,arguments);this.getRouter().initialize();this.setModel(a.createDeviceModel(),\"device\");var e=this;this.globalModel={constraints:{start:[],end:[],selectedConstraintStart:\"\",selectedConstraintEnd:\"\",selectedStartDate:\"\",selectedEndDate:\"\"},Venture:[],DOI:[],DOI2:[],revenueHeader:{},companyList:[],header:[],companyCode:[],ventureList:[],ventureList1:[],ventureList2:[],ventureList3:[],payoutCompanyNameList:[],payoutVentureList:[],payoutWellNameList:[],payoutOwnerNameList:[],payoutBPODOIList:[],payoutAPODOIList:[],payoutFrequencyList:[],BalAdjLineItemTotal:\"\",BalAdjLineItem:[{FormType:\"Bal\",FormNum:\"Bal_001\",GLAccount:\"\",Description:\"\",Amount:\"\",FundApproved:0,readOnly:false}],PayOutProvisionsLineItem:[],PayoutAddPayoutType:[],PayoutAddStatus:[],PayoutAddFrequency:[],PayoutTableData:[],PayoutID:\"00001\",PayoutVenture:[],PayoutidList:[],PayoutCostcenter:[],Payoutcostcenteradd:[]};this.setModel(this.globalModel,\"globalModel\")}})});",
+      "target": "webapp/Component.js"
+    },
+    {
+      "file": "Component-preload.js",
+      "reason": "UI5 preload bundle. Should be placed in webapp/ for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "//@ui5-bundle sierra/pra/PRA_Custom/Component-preload.js\njQuery.sap.registerPreloadedModules({\n\"version\":\"2.0\",\n\"modules\":{...",
+      "target": "webapp/Component-preload.js"
+    },
+    {
+      "file": "resources.json",
+      "reason": "Resource list for build tools. Review if needed for CF deployment or can be omitted.",
+      "action": "manual_review",
+      "snippets": "{\n    \"resources\": [\n        {\n            \"name\": \"view/doi_header_add.fragment.xml\"\n        },\n        ...",
+      "target": "webapp/"
+    },
+    {
+      "file": "di.code-validation.core_issues.json",
+      "reason": "Code validation issues. Review and resolve any errors before migration.",
+      "action": "manual_review",
+      "snippets": "{\"version\":\"1.0.0\",\"results\":{\"@sap/di.code-validation.js\":{\"issues\":{\"serviceBinding.js\":[{\"category\":\"Possible Error\",\"checker\":\"ESLint\",\"column\":10,\"helpUrl\":\"http://eslint.org/docs/rules/no-unused-vars\",\"line\":1,\"message\":\"'initModel' is defined but never used.\",\"path\":\"serviceBinding.js\",\"ruleId\":\"no-unused-vars\",\"severity\":\"warning\"}],...",
+      "target": "webapp/"
+    },
+    {
+      "file": "localService/metadata.xml",
+      "reason": "OData metadata for local mock server. Place in webapp/localService for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "<edmx:Edmx xmlns:edmx=\"http://schemas.microsoft.com/ado/2007/06/edmx\"\n\txmlns:m=\"http://schemas.microsoft.com/ado/2007/08/dataservices/metadata\" ...",
+      "target": "webapp/localService/metadata.xml"
+    },
+    {
+      "file": "model/models.js",
+      "reason": "UI5 model definition. Place in webapp/model for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "sap.ui.define([\"sap/ui/model/json/JSONModel\",\"sap/ui/Device\"],function(e,n){\"use strict\";return{createDeviceModel:function(){var i=new e(n);i.setDefaultBindingMode(\"OneWay\");return i}}});",
+      "target": "webapp/model/models.js"
+    },
+    {
+      "file": "model/models-dbg.js",
+      "reason": "Debug version of UI5 model. Place in webapp/model for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "sap.ui.define([\n\t\"sap/ui/model/json/JSONModel\",\n\t\"sap/ui/Device\"\n], function (JSONModel, Device) {\n\t\"use strict\";\n\n\treturn {\n\n\t\tcreateDeviceModel: function () {\n\t\t\tvar oModel = new JSONModel(Device);\n\t\t\toModel.setDefaultBindingMode(\"OneWay\");\n\t\t\treturn oModel;\n\t\t}\n\n\t};\n});",
+      "target": "webapp/model/models-dbg.js"
+    },
+    {
+      "file": "model/provision.json",
+      "reason": "Provision data for UI5 app. Place in webapp/model for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "{\n\t\"prov\": [{\n\t\t\t\"Account_ID\": \"6500.01\",\n\t\t\t\"Account_Description\": \"MISCELLANEOUS COSTS\",\n\t\t\t\"Exp_Amt\": \"1000.00\",\n\t\t\t\"Penalty\": \"0.00%\",\n\t\t\t\"checked\" : true\n\t\t}, ...",
+      "target": "webapp/model/provision.json"
+    },
+    {
+      "file": "revenue_data.json",
+      "reason": "Sample data for UI5 app. Place in webapp/ for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "{\n\t\t\"results\": [{\n\t\t\t\"__metadata\": {\n\t\t\t\t\"id\": \"https://webidetesting9375760-h9110f098.dispatcher.us3.hana.ondemand.com/sap/opu/odata/SAP/ZPRA_REVENUE_SRV_01/Revenue_HDRSet('214754')\",\n\t\t\t\t\"uri\": \"https://webidetesting9375760-h9110f098.dispatcher.us3.hana.ondemand.com/sap/opu/odata/SAP/ZPRA_REVENUE_SRV_01/Revenue_HDRSet('214754')\",\n\t\t\t\t\"type\": \"ZPRA_REVENUE_SRV_01.Revenue_HDR\"\n\t\t\t}, ...",
+      "target": "webapp/revenue_data.json"
+    },
+    {
+      "file": "sap-ui-cachebuster-info.json",
+      "reason": "Cachebuster info for UI5. Review if needed for CF deployment or can be omitted.",
+      "action": "manual_review",
+      "snippets": "{\n  \"test/integration/arrangements/Startup-dbg.js\": 1664278886000,\n  \"controller/collective_doi.controller.js\": 1664278886000,\n  ...",
+      "target": "webapp/"
+    },
+    {
+      "file": "resources/sap-ui-version.json",
+      "reason": "UI5 version info. Review if needed for CF deployment or can be omitted.",
+      "action": "manual_review",
+      "snippets": "{\n\t\"name\": \"PRA_Custom\",\n\t\"version\": \"0.0.1\",\n\t\"buildTimestamp\": \"202209271743\",\n\t\"scmRevision\": \"\",\n\t\"libraries\": []\n}",
+      "target": "webapp/resources/sap-ui-version.json"
+    },
+    {
+      "file": "i18n/i18n.properties",
+      "reason": "i18n resource bundle. Place in webapp/i18n for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "title=Sierra Extension for SAP PRA\nappTitle=Sierra PRA\nappDescription=sap-icon://loan",
+      "target": "webapp/i18n/i18n.properties"
+    },
+    {
+      "file": "css/style.css",
+      "reason": "Custom styles for UI5 app. Place in webapp/css for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "/* Enter your custom styles here */",
+      "target": "webapp/css/style.css"
+    },
+    {
+      "file": "controller/business_associate.controller.js",
+      "reason": "UI5 controller. Place in webapp/controller for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/core/Fragment\",\"sap/ui/model/json/JSONModel\",...",
+      "target": "webapp/controller/business_associate.controller.js"
+    },
+    {
+      "file": "controller/business_associate-dbg.controller.js",
+      "reason": "Debug version of UI5 controller. Place in webapp/controller for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "/*global XLSX*/\nsap.ui.define([\n\t\"sap/ui/core/mvc/Controller\",\n\t\"sap/ui/core/Fragment\",...",
+      "target": "webapp/controller/business_associate-dbg.controller.js"
+    },
+    {
+      "file": "view/business_associate.view.xml",
+      "reason": "UI5 XML view. Place in webapp/view for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "<mvc:View\n\t\tcontrollerName=\"sierra.pra.PRA_Custom.controller.business_associate\"\n\t\theight=\"100%\"\n\t\txmlns:mvc=\"sap.ui.core.mvc\" ...",
+      "target": "webapp/view/business_associate.view.xml"
+    },
+    {
+      "file": "test/testsuite.qunit.html",
+      "reason": "QUnit test suite. Place in webapp/test for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "<!DOCTYPE html>\n<html>\n<head>\n\t<title>QUnit test suite for Basic Template</title>\n\t<script src=\"../../resources/sap/ui/qunit/qunit-redirect.js\"></script>\n\t<script src=\"./testsuite.qunit.js\" data-sap-ui-testsuite></script>\n</head>\n<body>\n</body>\n</html>",
+      "target": "webapp/test/testsuite.qunit.html"
+    },
+    {
+      "file": "test/testsuite.qunit.js",
+      "reason": "QUnit test suite JS. Place in webapp/test for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "window.suite=function(){\"use strict\";var t=new parent.jsUnitTestSuite,n=location.pathname.substring(0,location.pathname.lastIndexOf(\"/\")+1);t.addTestPage(n+\"unit/unitTests.qunit.html\");t.addTestPage(n+\"integration/opaTests.qunit.html\");return t};",
+      "target": "webapp/test/testsuite.qunit.js"
+    },
+    {
+      "file": "test/unit/unitTests.qunit.html",
+      "reason": "QUnit unit test HTML. Place in webapp/test/unit for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "<!DOCTYPE html>\n<html>\n<head>\n\t<meta charset=\"utf-8\">\n\t<title>Unit tests for sierra.pra.PRA_Custom</title>\n\n\t<script id=\"sap-ui-bootstrap\"\n\t\tsrc=\"../../../resources/sap-ui-core.js\"\n\t\tdata-sap-ui-resourceroots='{\n\t\t\t\"sierra.pra.PRA_Custom\": \"../../\"\t\t\t\n\t\t}'>\n\t</script>\n\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../../resources/sap/ui/thirdparty/qunit-2.css\">\n\n\t<script src=\"../../../resources/sap/ui/thirdparty/qunit-2.js\"></script>\n\t<script src=\"../../../resources/sap/ui/qunit/qunit-junit.js\"></script>\n\t<script src=\"../../../resources/sap/ui/qunit/qunit-coverage.js\"></script>\n\n\t<script src=\"unitTests.qunit.js\"></script>\n</head>\n<body>\n\t<div id=\"qunit\"></div>\n\t<div id=\"qunit-fixture\"></div>\n</body>\n</html>\n",
+      "target": "webapp/test/unit/unitTests.qunit.html"
+    },
+    {
+      "file": "test/unit/unitTests.qunit.js",
+      "reason": "QUnit unit test JS. Place in webapp/test/unit for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "QUnit.config.autostart=false;sap.ui.getCore().attachInit(function(){\"use strict\";sap.ui.require([\"sierra/pra/PRA_Custom/test/unit/AllTests\"],function(){QUnit.start()})});",
+      "target": "webapp/test/unit/unitTests.qunit.js"
+    },
+    {
+      "file": "test/unit/controller/main.controller.js",
+      "reason": "Unit test for main controller. Place in webapp/test/unit/controller for HTML5 Application Repository.",
+      "action": "copy_as_is",
+      "snippets": "sap.ui.define([\"sierra/pra/PRA_Custom/controller/main.controller\"],function(n){\"use strict\";QUnit.module(\"main Controller\");QUnit.test(\"I should test the main controller\",function(t){var o=new n;o.onInit();t.ok(o)})});",
+      "target": "webapp/test/unit/controller/main.controller.js"
+    }
+    // ... repeat for all other controller, view, fragment, test, and model files
+  ]
+}

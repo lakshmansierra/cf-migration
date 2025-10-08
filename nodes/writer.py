@@ -1,20 +1,17 @@
 import os
-from typing import Dict
-from utils.file_ops import copy_repo_to_output, write_text_file
+from typing import Dict, Tuple
+from utils.file_ops import write_text_file
 
-def write_output(output_root: str, repo_root: str, transformed_files: Dict[str, str]) -> Dict[str, str]:
-    """
-    - Copy full repo to output_root
-    - Overwrite transformed files into the output_root paths
-    Returns mapping of written files.
-    """
-    os.makedirs(output_root, exist_ok=True)
-    copy_repo_to_output(repo_root, output_root)
+def write_output(transformed_files: Dict[str, str], output_dir: str) -> Tuple[str, Dict[str, str]]:
+    os.makedirs(output_dir, exist_ok=True)
+    written: Dict[str, str] = {}
 
-    written = {}
     for rel_target, content in transformed_files.items():
-        dest_path = os.path.join(output_root, rel_target)
+        if rel_target.endswith("/") or rel_target.endswith("\\"):
+            continue
+        dest_path = os.path.join(output_dir, rel_target)
+        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
         write_text_file(dest_path, content)
         written[rel_target] = dest_path
 
-    return written
+    return output_dir, written
