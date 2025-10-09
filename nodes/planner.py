@@ -88,43 +88,30 @@ def call_llm(prompt: str) -> str:
 # Generate Migration Plan
 # ------------------------
 def plan_migration(repo_root: str) -> Tuple[dict, dict]:
+    # 1️⃣ Read all filenames and short file contents (snippets)
     filenames, snippets = gather_repo_files(repo_root)
-    plan_items = []
 
-    app_name = "my_app"  # Ideally derived from neo-app.json
+    # 2️⃣ Build the AI prompt dynamically based on project files
+    prompt = "Here are the files in my SAP Neo project:\n"
+    prompt += json.dumps(filenames, indent=2)
+    prompt += "\n\nHere are short snippets from these files:\n"
+    prompt += json.dumps(snippets, indent=2)
+    prompt += "\n\nPlease produce a JSON migration plan as described in the system prompt."
 
-    for f in filenames:
-        # Default target is same as source unless mapped
-        target = f
-        action = "manual_review"
+    # 3️⃣ Ask the AI to generate the migration plan
+    print("\n🧠 Calling SAP AI Core LLM to create migration plan...")
+    ai_response = call_llm(prompt)
 
-        if f.endswith("neo-app.json"):
-            target = f"app/xs-app.json"
-            action = "convert_xsapp"
-        elif f.endswith("manifest.json"):
-            target = f"app/manifest.json"
-            action = "convert_manifest"
-        elif "controller" in f:
-            target = f"app/controller/{os.path.basename(f)}"
-            action = "convert_ui5"
-        elif "view" in f:
-            target = f"app/view/{os.path.basename(f)}"
-            action = "convert_ui5"
-        elif "i18n" in f:
-            target = f"app/resources/i18n/{os.path.basename(f)}"
-            action = "copy_as_is"
-        else:
-            target = f"app/{f}"
-            action = "manual_review"
+    # 4️⃣ Parse the AI's response (string → Python dict)
+    try:
+        plan = json.loads(ai_response)
+        print("✅ AI returned a valid migration plan.")
+    except json.JSONDecodeError:
+        print("⚠️ AI returned invalid JSON. Saving raw response instead.")
+        plan = {"error": "invalid_json", "raw_response": ai_response}
 
-        plan_items.append({
-            "file": f,
-            "reason": f"Detected by pattern for CF migration",
-            "action": action,
-            "snippets": snippets.get(f, "")[:200],
-            "target": target
-        })
-
-    plan = {"plan": plan_items}
+    # 5️⃣ Save the AI-generated plan for reference
     save_dict_to_file(plan, os.path.join(repo_root, "plan_migration.json"))
+
+    # 6️⃣ Return the AI-generated plan and snippets
     return plan, snippets
