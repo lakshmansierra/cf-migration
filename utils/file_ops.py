@@ -27,7 +27,14 @@ def copy_repo_to_output(src_repo_path: str, dest_output_path: str) -> None:
             dst_file = os.path.join(dest_root, f)
             shutil.copy2(src_file, dst_file)
 
+import os
+
 def read_text_file(path: str) -> str:
+    """Read a text file. If path is a directory, skip safely."""
+    if os.path.isdir(path):
+        print(f" Skipping directory instead of reading: {path}")
+        return ""  # Return empty content or skip
+
     with open(path, "r", encoding="utf-8", errors="ignore") as f:
         return f.read()
 

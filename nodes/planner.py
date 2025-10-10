@@ -26,7 +26,6 @@ llm = ChatOpenAI(
 SYSTEM_PROMPT = """
 You are a senior SAP BTP migration engineer.
 Inspect a SAP Neo project and produce a migration plan to Cloud Foundry (CF)
-using Managed Approuter + HTML5 Application Repository.
 
 Return JSON of the form:
 {
@@ -43,9 +42,18 @@ Return JSON of the form:
 Return only valid JSON, nothing else.
 """
 
-def gather_repo_files(repo_dir: str, max_chars=2000) -> Tuple[list, dict]:
-    filenames, snippets = [], {}
-    for root, _, files in os.walk(repo_dir):
+def gather_repo_files(repo_dir: str, max_chars=2000):
+    filenames = []
+    snippets = {}
+
+    for root, dirs, files in os.walk(repo_dir):
+        # Add directories
+        for d in dirs:
+            rel_path = os.path.relpath(os.path.join(root, d), repo_dir)
+            filenames.append(rel_path)
+            snippets[rel_path] = "<directory>"
+
+        # Add files
         for f in files:
             rel_path = os.path.relpath(os.path.join(root, f), repo_dir)
             filenames.append(rel_path)
@@ -53,7 +61,9 @@ def gather_repo_files(repo_dir: str, max_chars=2000) -> Tuple[list, dict]:
                 snippets[rel_path] = read_text_file(os.path.join(root, f))[:max_chars]
             except Exception:
                 snippets[rel_path] = "<unreadable>"
+
     return filenames, snippets
+
 
 def call_llm(prompt: str) -> str:
     messages = [
@@ -114,7 +124,7 @@ def plan_migration(repo_root: str, output_dir: str) -> Tuple[Dict, Dict]:
         plan = json.loads(cleaned_json)
     except json.JSONDecodeError:
         plan = {"error": "failed_to_parse_plan", "raw": plan_text}
-        print(f"⚠️ Failed to parse LLM response. Saved raw output to {raw_file}")
+        print(f" Failed to parse LLM response. Saved raw output to {raw_file}")
 
     save_dict_to_file(plan, f"{output_dir}/plan_migration.json")
 
