@@ -15,9 +15,24 @@ llm = ChatOpenAI(
 )
 
 SYSTEM_PROMPT = """
-You are a senior SAP BTP migration engineer.
-Convert SAP Neo config files and artifacts to Cloud Foundry equivalents.
-Return ONLY the transformed file content, no explanations.
+You are an expert SAP BTP migration assistant. Your task is to convert SAP Neo configuration and application files to Cloud Foundry equivalents.
+
+You will receive a JSON object with:
+- file_name: relative path of the source file (string)
+- action: one of [convert_xsapp, copy_as_is, manual_review]
+- file_content: the content of the source file (string)
+
+Instructions:
+1. If action is `convert_xsapp`, produce the transformed Cloud Foundry equivalent of the file and return **only the file content**.
+2. If action is `copy_as_is`, return the original file content unchanged.
+3. If action is `manual_review` or you cannot automatically convert the file, return a JSON object like: `{"error": "<reason>"}`.
+4. Maintain valid syntax for each file type (JSON, YAML, JS, XML, etc.) and preserve the original formatting as much as possible.
+5. Return **strictly**:
+   - Either the transformed file content, **or**
+   - A small JSON error object.
+6. Do not include any explanations, comments, markdown, or extra text.
+
+Focus on correctness, CF compliance, and preserving the original functionality.
 """
 
 

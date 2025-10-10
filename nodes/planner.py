@@ -5,6 +5,7 @@ from typing import Dict, Any, Tuple
 from gen_ai_hub.proxy.langchain.openai import ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
 from utils.file_ops import read_text_file, save_dict_to_file
+from nodes.planner import call_llm, gather_repo_files
 
 # SAP AI Core Deployment ID
 LLM_DEPLOYMENT_ID = "dadede28a723f679"
@@ -24,23 +25,34 @@ llm = ChatOpenAI(
 )
 
 SYSTEM_PROMPT = """
-You are a senior SAP BTP migration engineer.
-Inspect a SAP Neo project and produce a migration plan to Cloud Foundry (CF)
+You are an expert SAP BTP migration engineer.
+Your task is to inspect a SAP Neo project and generate a migration plan for Cloud Foundry (CF).
 
-Return JSON of the form:
+Return **only valid JSON** in the following format:
+
 {
   "plan": [
     {
       "file": "<Neo relative path>",
-      "reason": "<why this action>",
-      "action": "<convert_mta, convert_manifest, convert_xsapp, convert_ui5, copy_as_is, manual_review>",
-      "snippets": "<file content or first few lines>",
+      "reason": "<why this file/folder requires migration or special handling>",
+      "action": "<one of: convert_mta | convert_manifest | convert_xsapp | convert_ui5 | copy_as_is | manual_review>",
+      "snippets": "<short snippet of file content or first few lines>",
       "target": "<CF target path>"
     }
   ]
 }
-Return only valid JSON, nothing else.
+
+Rules:
+1. Include all files and folders that are relevant for migration. 
+2. Decide the `action` based on the file type, purpose, and role in the Neo project.
+3. `snippets` should summarize the content of the file (a few lines).
+4. `target` should indicate the appropriate path in CF after migration.
+5. Never include explanations, markdown, or any text outside of the JSON.
+6. Make the plan complete and consistent, even for files or folders not explicitly mentioned.
+
+Output must be **strictly parseable JSON**.
 """
+
 
 def gather_repo_files(repo_dir: str, max_chars=2000):
     filenames = []
@@ -75,22 +87,6 @@ def call_llm(prompt: str) -> str:
     except Exception as e:
         return json.dumps({"error": f"llm_call_failed: {str(e)}"})
 
-
-from typing import Tuple, Dict
-import json
-import re
-from utils.file_ops import read_text_file, save_dict_to_file
-
-import json
-import re
-from typing import Tuple, Dict
-from utils.file_ops import read_text_file, save_dict_to_file
-from nodes.planner import call_llm, gather_repo_files
-
-import json
-from typing import Tuple, Dict
-from utils.file_ops import read_text_file, save_dict_to_file
-from nodes.planner import call_llm, gather_repo_files
 
 def extract_first_json(text: str) -> str:
     start = text.find("{")

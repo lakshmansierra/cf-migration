@@ -11,7 +11,7 @@ def run_migration(source_repo: str, output_dir: str) -> Dict[str, Any]:
         print(" No migration plan generated.")
         return None
 
-    print("🛠️ Transforming files based on migration plan...")
+    print(" Transforming files based on migration plan...")
     transformed_files = transform_files(source_repo, plan, snippets, output_dir)
     if not transformed_files:
         print(" No files were transformed.")
