@@ -1,6 +1,5 @@
 import os
 import json
-import re
 from typing import Dict, Any, Tuple
 from gen_ai_hub.proxy.langchain.openai import ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
@@ -18,30 +17,56 @@ os.environ["AICORE_RESOURCE_GROUP"] = "default"
 os.environ["AICORE_BASE_URL"] = "https://api.ai.prod.us-east-1.aws.ml.hana.ondemand.com/v2"
 
 # --- Model Deployment ---
-LLM_DEPLOYMENT_ID = "dadede28a723f679"  # ✅ Replace with your actual Gemini-2.5-pro deployment if needed
+LLM_DEPLOYMENT_ID = "dadede28a723f679"
 
 # ------------------------
 # System prompt for planner
 # ------------------------
 SYSTEM_PROMPT = """
-You are a senior SAP BTP migration engineer.
-Inspect a SAP Neo project and produce a migration plan to Cloud Foundry (CF)
-using Managed Approuter + HTML5 Application Repository.
+You are an expert SAP BTP migration engineer.
+Your task is to analyze a complete SAP Neo project structure and create a migration plan
+that transforms it into an equivalent Cloud Foundry (CF) application layout.
 
-Return JSON of the form:
+---
+
+### 🎯 OBJECTIVE
+Generate a structured migration plan that shows:
+1. What each file or folder represents in the Neo project.
+2. What action should be performed to adapt or migrate it to CF.
+3. Where its transformed version should exist in the CF project structure.
+
+You must infer all CF target paths, structure, and app hierarchy automatically.
+Do not rely on predefined folder names or conversion rules — decide everything yourself.
+
+---
+
+### 📦 EXPECTED OUTPUT
+Return only a valid JSON object in the following structure:
+
 {
   "plan": [
     {
-      "file": "<Neo relative path>",
-      "reason": "<why this action>",
-      "action": "<convert_mta, convert_manifest, convert_xsapp, convert_ui5, copy_as_is, manual_review>",
-      "snippets": "<file content or first few lines>",
-      "target": "<CF target path>"
+      "file": "<original Neo relative path>",
+      "reason": "<why this file exists and how it should migrate>",
+      "action": "<auto-decided label such as 'transform', 'adapt', 'copy', 'ignore', 'manual_review'>",
+      "snippets": "<trimmed content sample>",
+      "target": "<auto-inferred Cloud Foundry target path>"
     }
   ]
 }
-Return only valid JSON, nothing else.
+
+---
+
+### 🧠 RULES
+- Analyze filenames, folder context, and snippets to infer each file’s purpose.
+- Automatically design the Cloud Foundry folder layout and file destinations.
+- The `"target"` field must reflect the structure you propose — create it logically.
+- Avoid hardcoded examples or assumptions about CF architecture.
+- If uncertain, set `"action": "manual_review"`.
+- Return **only valid JSON** — no extra commentary, text, or markdown.
 """
+
+
 
 # ------------------------
 # Gather repo files
@@ -63,10 +88,7 @@ def gather_repo_files(repo_dir: str, max_chars=2000) -> Tuple[list, dict]:
 # ------------------------
 # Initialize LLM
 # ------------------------
-llm = ChatOpenAI(
-    deployment_id=LLM_DEPLOYMENT_ID,
-    temperature=0,
-)
+llm = ChatOpenAI(deployment_id=LLM_DEPLOYMENT_ID, temperature=0)
 
 
 # ------------------------
@@ -88,21 +110,19 @@ def call_llm(prompt: str) -> str:
 # Generate Migration Plan
 # ------------------------
 def plan_migration(repo_root: str) -> Tuple[dict, dict]:
-    # 1️⃣ Read all filenames and short file contents (snippets)
     filenames, snippets = gather_repo_files(repo_root)
 
-    # 2️⃣ Build the AI prompt dynamically based on project files
+    # Build prompt dynamically
     prompt = "Here are the files in my SAP Neo project:\n"
     prompt += json.dumps(filenames, indent=2)
     prompt += "\n\nHere are short snippets from these files:\n"
     prompt += json.dumps(snippets, indent=2)
-    prompt += "\n\nPlease produce a JSON migration plan as described in the system prompt."
+    prompt += "\n\nPlease generate a complete JSON migration plan as described in the system prompt."
 
-    # 3️⃣ Ask the AI to generate the migration plan
     print("\n🧠 Calling SAP AI Core LLM to create migration plan...")
     ai_response = call_llm(prompt)
 
-    # 4️⃣ Parse the AI's response (string → Python dict)
+    # Parse JSON response
     try:
         plan = json.loads(ai_response)
         print("✅ AI returned a valid migration plan.")
@@ -110,8 +130,5 @@ def plan_migration(repo_root: str) -> Tuple[dict, dict]:
         print("⚠️ AI returned invalid JSON. Saving raw response instead.")
         plan = {"error": "invalid_json", "raw_response": ai_response}
 
-    # 5️⃣ Save the AI-generated plan for reference
     save_dict_to_file(plan, os.path.join(repo_root, "plan_migration.json"))
-
-    # 6️⃣ Return the AI-generated plan and snippets
     return plan, snippets
