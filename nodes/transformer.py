@@ -3,10 +3,19 @@ import json
 from typing import Dict, Any
 from utils.file_ops import read_text_file, save_dict_to_file
 
-from langchain_ollama import ChatOllama
+from gen_ai_hub.proxy.langchain.openai import ChatOpenAI
 from langchain.schema import HumanMessage
 
-llm = ChatOllama(model="mistral:latest")
+
+# --- ENV SETUP ---
+os.environ['AICORE_CLIENT_ID'] = "sb-42a29a03-b2f4-47de-9a41-e0936be9aaf5!b256749|aicore!b164"
+os.environ['AICORE_AUTH_URL'] = "https://gen-ai.authentication.us10.hana.ondemand.com/oauth/token"
+os.environ['AICORE_CLIENT_SECRET'] = "b5e6caee-15aa-493a-a6ac-1fef0ab6e9fe$Satg7UGYPLsz5YYeXefHpbwTfEqqCkQEbasMDPGHAgU="
+os.environ['AICORE_RESOURCE_GROUP'] = "default"
+os.environ['AICORE_BASE_URL'] = "https://api.ai.prod.us-east-1.aws.ml.hana.ondemand.com/v2"
+LLM_DEPLOYMENT_ID = "d223bf19a092cfb3"
+ 
+llm = ChatOpenAI(deployment_id=LLM_DEPLOYMENT_ID)
 
 SYSTEM_PROMPT = """
 You are a migration assistant that converts SAP Neo config files and application files to Cloud Foundry equivalents.
@@ -46,5 +55,8 @@ def transform_files(repo_root: str, plan: Dict[str, Any]) -> Dict[str, str]:
         resp = llm.invoke([HumanMessage(content=prompt)])
 
         results[target] = resp
-    save_dict_to_file(results, "transform_files_return.txt")
+    # save_dict_to_file(results, "transform_files_return.txt")
     return results
+    print(result)
+
+
