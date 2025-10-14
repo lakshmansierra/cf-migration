@@ -122,6 +122,14 @@ def plan_migration(repo_root: str) -> Tuple[dict, dict]:
     print("\n🧠 Calling SAP AI Core LLM to create migration plan...")
     ai_response = call_llm(prompt)
 
+    # 🆕 Save the *raw* LLM output (for debugging)
+    raw_output_path = os.path.join(repo_root, "ai_raw_response.json")
+    with open(raw_output_path, "w", encoding="utf-8") as f:
+        f.write(ai_response)
+
+    print("🧾 AI Response saved to:", raw_output_path)
+    print("🧾 AI Response preview:\n", ai_response)
+
     # Parse JSON response
     try:
         plan = json.loads(ai_response)

@@ -20,16 +20,15 @@ class MigrationState(TypedDict, total=False):
 
 # Node functions
 def planner_node(state: MigrationState) -> MigrationState:
-    plan, snippets = plan_migration(state["repo_path"])
-    state["plan"] = plan
+    plan_dict, snippets = plan_migration(state["repo_path"])  # unpack tuple
+    state["plan"] = plan_dict.get("plan", [])
+    state["snippets"] = snippets  # already have snippets separately
     return state
 
 
 def transformer_node(state: MigrationState) -> MigrationState:
-    # Default app_name
     app_name = "app"
 
-    # Try to read app_name from neo-app.json routes
     neo_app_path = os.path.join(state["repo_path"], "neo-app.json")
     if os.path.exists(neo_app_path):
         try:
@@ -38,7 +37,7 @@ def transformer_node(state: MigrationState) -> MigrationState:
             if routes and "target" in routes[0]:
                 app_name = routes[0]["target"].split("/")[0]
         except Exception:
-            app_name = "app"
+            pass
 
     transformed = transform_files(state["repo_path"], state["plan"], app_name)
     state["transformed_files"] = transformed
@@ -47,7 +46,7 @@ def transformer_node(state: MigrationState) -> MigrationState:
 
 def writer_node(state: MigrationState) -> MigrationState:
     output_path = prepare_output_dir(base_prefix="cf_repo_")
-    written = write_output(output_path, state["repo_path"], state["transformed_files"])
+    written = write_output(output_path, state["transformed_files"])  # only 2 args
     state["output_path"] = output_path
     state["written_files"] = written
     return state

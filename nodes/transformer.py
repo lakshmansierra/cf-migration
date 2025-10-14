@@ -73,9 +73,9 @@ llm = ChatOpenAI(deployment_id=LLM_DEPLOYMENT_ID, temperature=0.2)
 # ------------------------
 # Transform files
 # ------------------------
-def transform_files(repo_root: str, plan: Dict[str, Any], app_name: str) -> Dict[str, str]:
+def transform_files(repo_root: str, plan_items: list, app_name: str) -> Dict[str, str]:
     results: Dict[str, str] = {}
-    items = plan.get("plan", [])
+    items = plan_items  # plan_items is already a list
 
     for item in items:
         src_rel = item["file"]
@@ -107,9 +107,23 @@ def transform_files(repo_root: str, plan: Dict[str, Any], app_name: str) -> Dict
 
         results[target_rel] = transformed_content
 
-    save_dict_to_file(results, os.path.join(repo_root, "transform_files_return.json"))
-    return results
+    # ------------------------
+    # Save results (JSON + TXT)
+    # ------------------------
+    json_path = os.path.join(repo_root, "transform_files_return.json")
+    txt_path = os.path.join(repo_root, "transform_files_return.txt")
 
+    # Save structured JSON
+    save_dict_to_file(results, json_path)
+
+    # Save readable TXT version
+    with open(txt_path, "w", encoding="utf-8") as f:
+        for target, content in results.items():
+            f.write(f"=== {target} ===\n{content}\n\n")
+
+    print(f"✅ Transformer outputs saved to:\n - {json_path}\n - {txt_path}")
+
+    return results
 
 # ------------------------
 # Save transformed files to disk
