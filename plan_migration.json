@@ -1,0 +1,151 @@
+{
+  "plan": [
+    {
+      "file": "neo-app.json",
+      "reason": "Contains Neo-specific routes and configuration; must be converted to xs-app.json for CF.",
+      "action": "convert_xsapp",
+      "snippets": "{ \"welcomeFile\": \"/index.html\", \"routes\": [ ... ] }",
+      "target": "xs-app.json"
+    },
+    {
+      "file": "manifest.json",
+      "reason": "UI5 application manifest; review for CF compatibility and reference in mta.yaml.",
+      "action": "convert_mta",
+      "snippets": "{ \"_version\": \"1.12.0\", \"sap.app\": { ... } }",
+      "target": "webapp/manifest.json"
+    },
+    {
+      "file": "manifest-bundle.zip",
+      "reason": "Neo deployment artifact; not needed for CF, manual review for any custom content.",
+      "action": "manual_review",
+      "snippets": "PK\u0003\u0004\u0014\u0000\u0000\b\b\u0000r;Uyx ...",
+      "target": null
+    },
+    {
+      "file": "index.html",
+      "reason": "UI5 app entry point; update resource paths for CF deployment.",
+      "action": "convert_ui5",
+      "snippets": "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"utf-8\">...",
+      "target": "webapp/index.html"
+    },
+    {
+      "file": "Component.js",
+      "reason": "Main UI5 component; copy as is unless CF-specific changes are needed.",
+      "action": "copy_as_is",
+      "snippets": "sap.ui.define([\"sap/ui/core/UIComponent\", ...",
+      "target": "webapp/Component.js"
+    },
+    {
+      "file": "Component-preload.js",
+      "reason": "UI5 preload bundle; regenerate in CF build pipeline.",
+      "action": "manual_review",
+      "snippets": "//@ui5-bundle sierra/pra/PRA_Custom/Component-preload.js ...",
+      "target": null
+    },
+    {
+      "file": "Component-dbg.js",
+      "reason": "Debug version of main component; not needed in CF production, manual review.",
+      "action": "manual_review",
+      "snippets": "sap.ui.define([\n\t\"sap/ui/core/UIComponent\", ...",
+      "target": null
+    },
+    {
+      "file": "controller",
+      "reason": "Contains UI5 controller logic; copy as is.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/controller"
+    },
+    {
+      "file": "css",
+      "reason": "Custom styles for UI5 app; copy as is.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/css"
+    },
+    {
+      "file": "i18n",
+      "reason": "Internationalization resources; copy as is.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/i18n"
+    },
+    {
+      "file": "localService",
+      "reason": "OData metadata for mock server; copy as is for local testing.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/localService"
+    },
+    {
+      "file": "model",
+      "reason": "UI5 models and data; copy as is.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/model"
+    },
+    {
+      "file": "resources",
+      "reason": "App resources and version info; copy as is.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/resources"
+    },
+    {
+      "file": "test",
+      "reason": "Unit and integration tests; copy as is for CF test pipeline.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/test"
+    },
+    {
+      "file": "view",
+      "reason": "UI5 XML views and fragments; copy as is.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/view"
+    },
+    {
+      "file": "di.code-validation.core_issues.json",
+      "reason": "Code validation results; not needed in CF, manual review.",
+      "action": "manual_review",
+      "snippets": "{\"version\":\"1.0.0\",\"results\":{...}",
+      "target": null
+    },
+    {
+      "file": "resources.json",
+      "reason": "Resource manifest; manual review for CF relevance.",
+      "action": "manual_review",
+      "snippets": "{ \"resources\": [ ... ] }",
+      "target": null
+    },
+    {
+      "file": "revenue_data.json",
+      "reason": "Sample/mock data; copy as is for local testing.",
+      "action": "copy_as_is",
+      "snippets": "{\n\t\t\"results\": [{\n\t\t\t\"__metadata\": { ... }",
+      "target": "webapp/revenue_data.json"
+    },
+    {
+      "file": "sap-ui-cachebuster-info.json",
+      "reason": "UI5 cachebuster info; regenerate in CF build pipeline.",
+      "action": "manual_review",
+      "snippets": "{\n  \"test/integration/arrangements/Startup-dbg.js\": ...",
+      "target": null
+    },
+    {
+      "file": "plan_migration_return.txt",
+      "reason": "Migration plan artifact; not needed in CF.",
+      "action": "manual_review",
+      "snippets": "{\n  \"plan\": [\n    {\n      \"file\": \"neo-app.json\", ...",
+      "target": null
+    },
+    {
+      "file": "_gather_return.txt",
+      "reason": "Gathered file list; not needed in CF.",
+      "action": "manual_review",
+      "snippets": "{\n  \"filenames\": [\n    \"Component-dbg.js\", ...",
+      "target": null
+    }
+  ]
+}

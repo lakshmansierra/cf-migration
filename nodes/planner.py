@@ -1,6 +1,5 @@
 import os
 import json
-import re
 from typing import Dict, Any, Tuple
 from gen_ai_hub.proxy.langchain.openai import ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
@@ -52,19 +51,16 @@ Rules:
 Output must be **strictly parseable JSON**.
 """
 
-
 def gather_repo_files(repo_dir: str, max_chars=2000):
     filenames = []
     snippets = {}
 
     for root, dirs, files in os.walk(repo_dir):
-        # Add directories
         for d in dirs:
             rel_path = os.path.relpath(os.path.join(root, d), repo_dir)
             filenames.append(rel_path)
             snippets[rel_path] = "<directory>"
 
-        # Add files
         for f in files:
             rel_path = os.path.relpath(os.path.join(root, f), repo_dir)
             filenames.append(rel_path)
@@ -75,7 +71,6 @@ def gather_repo_files(repo_dir: str, max_chars=2000):
 
     return filenames, snippets
 
-
 def call_llm(prompt: str) -> str:
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
@@ -85,7 +80,6 @@ def call_llm(prompt: str) -> str:
         return llm.invoke(messages).content
     except Exception as e:
         return json.dumps({"error": f"llm_call_failed: {str(e)}"})
-
 
 def extract_first_json(text: str) -> str:
     start = text.find("{")
@@ -101,26 +95,24 @@ def extract_first_json(text: str) -> str:
                 return text[start:i+1]
     return text[start:]
 
-def plan_migration(repo_root: str, output_dir: str) -> Tuple[Dict, Dict]:
+def plan_migration(repo_root: str) -> Tuple[Dict, Dict]:
     filenames, snippets = gather_repo_files(repo_root)
     repo_json = {"filenames": filenames, "snippets": snippets}
     prompt = json.dumps(repo_json, indent=2)
 
+    #print("Planning migration...")
     plan_text = call_llm(prompt)
 
-    # Save raw output for debugging
-    raw_file = f"{output_dir}/raw_llm_output.txt"
-    with open(raw_file, "w", encoding="utf-8") as f:
-        f.write(plan_text)
-
     cleaned_json = extract_first_json(plan_text)
-
     try:
         plan = json.loads(cleaned_json)
     except json.JSONDecodeError:
         plan = {"error": "failed_to_parse_plan", "raw": plan_text}
-        print(f" Failed to parse LLM response. Saved raw output to {raw_file}")
+        print(" Failed to parse LLM response.")
 
-    save_dict_to_file(plan, f"{output_dir}/plan_migration.json")
+    # Save directly in VS Code folder
+    vs_code_path = os.path.abspath("plan_migration.json")
+    save_dict_to_file(plan, vs_code_path)
+    print(f" Migration plan saved in VS Code folder: {vs_code_path}")
 
     return plan, snippets

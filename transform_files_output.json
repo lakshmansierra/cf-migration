@@ -1,0 +1,23 @@
+{
+  "xs-app.json": "**Converted xs-app.json for Cloud Foundry:**\n\n```json\n{\n  \"welcomeFile\": \"/index.html\",\n  \"authenticationMethod\": \"none\",\n  \"routes\": [\n    {\n      \"source\": \"^/resources/(.*)$\",\n      \"target\": \"/resources/$1\",\n      \"localDir\": \"resources\",\n      \"authenticationType\": \"none\"\n    },\n    {\n      \"source\": \"^/test-resources/(.*)$\",\n      \"target\": \"/test-resources/$1\",\n      \"localDir\": \"test-resources\",\n      \"authenticationType\": \"none\"\n    },\n    {\n      \"source\": \"^/sap/opu/odata/(.*)$\",\n      \"destination\": \"WebIDE_1909\",\n      \"authenticationType\": \"none\"\n    }\n  ]\n}\n```\n\n**Notes:**\n- SAPUI5 resources and test-resources are mapped as static resources (`localDir`). Adjust `localDir` if your folder structure differs.\n- The OData route uses the destination name as in Neo.\n- `authenticationMethod` is set to `\"none\"` for simplicity; adjust if authentication is required.\n- Duplicate routes have been consolidated.\n- `sendWelcomeFileRedirect` is not needed in xs-app.json for CF.",
+  "manifest.json": "<skipped: convert_mta>",
+  "manifest-bundle.zip": "<skipped: manual_review>",
+  "webapp/index.html": "<!--\nCloud Foundry UI5 index.html conversion notes:\n- In CF, static files are typically served from the /webapp folder.\n- The bootstrap src should use the CDN or relative path if deployed as static.\n- No changes needed for UI5 bootstrap for CF, but recommend using CDN for sap-ui-core.js for best practice.\n-->\n\n<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>PRA_Custom</title>\n    <!-- Use CDN for SAPUI5 in Cloud Foundry, or adjust path if serving locally -->\n    <script id=\"sap-ui-bootstrap\"\n      src=\"https://ui5.sap.com/resources/sap-ui-core.js\"\n      data-sap-ui-theme=\"sap_fiori_3\"\n      data-sap-ui-resourceroots='{\"sierra.pra.PRA_Custom\": \"./\"}'\n      data-sap-ui-compatVersion=\"edge\"\n      data-sap-ui-oninit=\"module:sap/ui/core/ComponentSupport\"\n      data-sap-ui-async=\"true\"\n      data-sap-ui-frameOptions=\"trusted\">\n    </script>\n  </head>\n  <body class=\"sapUiBody\">\n    <div data-sap-ui-component data-name=\"sierra.pra.PRA_Custom\" data-id=\"container\" data-settings='{\"id\" : \"PRA_Custom\"}'></div>\n  </body>\n</html>",
+  "webapp/Component.js": "**No transformation needed for `Component.js`.**\n\nThis file contains standard SAPUI5 JavaScript code and does not include any Neo-specific configuration. You can copy it as-is to your Cloud Foundry project.",
+  "Component-preload.js": "<skipped: manual_review>",
+  "Component-dbg.js": "<skipped: manual_review>",
+  "webapp/controller": "<directory copied>",
+  "webapp/css": "<directory copied>",
+  "webapp/i18n": "<directory copied>",
+  "webapp/localService": "<directory copied>",
+  "webapp/model": "<directory copied>",
+  "webapp/resources": "<directory copied>",
+  "webapp/test": "<directory copied>",
+  "webapp/view": "<directory copied>",
+  "di.code-validation.core_issues.json": "<skipped: manual_review>",
+  "resources.json": "<skipped: manual_review>",
+  "webapp/revenue_data.json": "File: revenue_data.json\n\nAction: copy as is\n\nNo transformation needed. This is a data file and can be used as-is in Cloud Foundry.",
+  "sap-ui-cachebuster-info.json": "<skipped: manual_review>",
+  "plan_migration_return.txt": "<skipped: manual_review>",
+  "_gather_return.txt": "<skipped: manual_review>"
+}

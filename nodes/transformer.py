@@ -17,24 +17,8 @@ llm = ChatOpenAI(
 SYSTEM_PROMPT = """
 You are an expert SAP BTP migration assistant. Your task is to convert SAP Neo configuration and application files to Cloud Foundry equivalents.
 
-You will receive a JSON object with:
-- file_name: relative path of the source file (string)
-- action: one of [convert_xsapp, copy_as_is, manual_review]
-- file_content: the content of the source file (string)
-
-Instructions:
-1. If action is `convert_xsapp`, produce the transformed Cloud Foundry equivalent of the file and return **only the file content**.
-2. If action is `copy_as_is`, return the original file content unchanged.
-3. If action is `manual_review` or you cannot automatically convert the file, return a JSON object like: `{"error": "<reason>"}`.
-4. Maintain valid syntax for each file type (JSON, YAML, JS, XML, etc.) and preserve the original formatting as much as possible.
-5. Return **strictly**:
-   - Either the transformed file content, **or**
-   - A small JSON error object.
-6. Do not include any explanations, comments, markdown, or extra text.
-
-Focus on correctness, CF compliance, and preserving the original functionality.
+Return only transformed content for CF or indicate skipped files.
 """
-
 
 def transform_files(repo_root: str, plan: Dict, snippets: Dict, output_dir: str) -> Dict[str, str]:
     results = {}
@@ -52,31 +36,32 @@ def transform_files(repo_root: str, plan: Dict, snippets: Dict, output_dir: str)
     for item in plan.get("plan", []):
         rel = item.get("file")
         action = item.get("action")
-        target = (item.get("target") or rel).rstrip("/\\")  # remove trailing slashes
-        src_path = os.path.join(repo_root, rel)
-        dest_path = os.path.join(output_dir, target)
+        target = (item.get("target") or "").rstrip("/\\")
 
-        if not os.path.exists(src_path):
-            results[target] = f"#  Missing source file or folder: {rel}\n"
+        # Skip files that require manual review or have empty target
+        if action in ["manual_review", "convert_mta"] or not target:
+            results[rel] = f"<skipped: {action}>"
             continue
 
-        #  Handle directories safely
+        src_path = os.path.join(repo_root, rel)
+        if not os.path.exists(src_path):
+            results[rel] = "<skipped: missing source>"
+            continue
+
+        # Handle directories
         if os.path.isdir(src_path):
-            os.makedirs(dest_path, exist_ok=True)
+            dest_dir = os.path.join(output_dir, target)
+            os.makedirs(dest_dir, exist_ok=True)
             for root, dirs, files in os.walk(src_path):
                 rel_root = os.path.relpath(root, src_path)
-                current_dest = os.path.join(dest_path, rel_root) if rel_root != "." else dest_path
+                current_dest = os.path.join(dest_dir, rel_root) if rel_root != "." else dest_dir
                 os.makedirs(current_dest, exist_ok=True)
-
                 for f in files:
-                    src_file = os.path.join(root, f)
-                    dst_file = os.path.join(current_dest, f)
-                    shutil.copy2(src_file, dst_file)
+                    shutil.copy2(os.path.join(root, f), os.path.join(current_dest, f))
+            results[target] = "<directory copied>"
+            continue
 
-            results[target] = "<directory and contents copied>"
-            continue  #  stop here — don’t process it as a file below
-
-        #  Handle file transformation
+        # Handle file transformation
         try:
             content = read_text_file(src_path)
         except Exception:
@@ -99,15 +84,17 @@ def transform_files(repo_root: str, plan: Dict, snippets: Dict, output_dir: str)
         except Exception as e:
             transformed_content = json.dumps({"error": f"llm_call_failed: {str(e)}"})
 
-        #  Ensure parent folder exists before writing
+        # Write transformed file inside output_dir
+        dest_path = os.path.join(output_dir, target)
         os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-
-        # dest_path is guaranteed to be a file here
         with open(dest_path, "w", encoding="utf-8") as f:
             f.write(transformed_content)
 
         results[target] = transformed_content
 
-    #  Save transformation summary
-    save_dict_to_file(results, os.path.join(output_dir, "transform_files_output.json"))
+    # Save summary JSON in VS Code workspace
+    summary_path = os.path.join(os.getcwd(), "transform_files_output.json")
+    save_dict_to_file(results, summary_path)
+    print(f"\nTransformation summary saved in VS Code folder: {summary_path}")
+
     return results
