@@ -4,13 +4,13 @@ from utils.file_ops import prepare_output_dir
 import json
 
 def main():
-    source_repo = r"pra 1 1 (1)"
+    source_repo = r"C:\Users\stalin\Documents\cf\pra 1 1 (1)"
 
     if not os.path.exists(source_repo):
         print(f" Source repo path does not exist: {source_repo}")
         return
 
-    dest_repo = prepare_output_dir(base_prefix="cf_repo_")
+    `dest_repo = prepare_output_dir(base_prefix="cf_repo_")
     print(f" Source Neo repo: {source_repo}")
     print(f" Destination CF repo will be: {dest_repo}")
 

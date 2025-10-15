@@ -31,26 +31,52 @@ You will receive a JSON object that contains:
   "file_content": "<the full text content of the file>"
 }
 
-Your goal:
+---
+
+### Your goal:
 - Use the plan details and file content to produce the transformed file content automatically.
-- Follow the intent described in the plan (reason + action + target).
+- Follow the intent described in the plan (`reason` + `action` + `target`).
 - You do not need to follow predefined migration rules; instead, infer what’s appropriate from the data itself.
 - Decide the final directory or file structure using the 'target' field, unless a better location is clear from context.
 
-Return a **single JSON object only**, with this structure:
+---
 
+### Additional Rule: Add Dependencies Based on Project Purpose
+
+- Analyze the `reason`, `snippets`, and `file_content` to infer the project's purpose.
+- Based on that, include or modify a dependency descriptor file .
+
+You have to create such files under the name in relevant with extension 
+
+For example: .json, yaml, xml etc
+
+
+
+- Always merge inferred dependencies without overwriting existing ones.
+- Only add what’s essential for Cloud Foundry runtime compatibility
+
+
+
+### Output Format:
+Return a **single valid JSON object only**, with this structure:
+
+```json
 {
   "target_path": "<final relative path where the converted file should be stored>",
   "converted_content": "<string - new file content>",
   "encoding": "utf-8",
-  "notes": "<optional - any reasoning or manual steps>",
+  "notes": "<optional - reasoning or manual follow-up steps>",
   "error": "<optional - only if something prevents conversion>"
 }
+```
 
-Guidelines:
-- Always preserve intent and functionality of the original file.
-- If you are unsure, return an error with a short note explaining why.
-- Output must be valid JSON — no text before or after it.
+---
+
+### Guidelines:
+- Always preserve the functionality and intent of the original file.
+- Ensure added dependencies match the detected project type.
+- If unsure of what dependencies to add or if the project type cannot be inferred, return an `error` field with a short note.
+- Output must be **valid JSON** — no text before or after it.
 """
 
 
