@@ -24,32 +24,37 @@ llm = ChatOpenAI(
 
 SYSTEM_PROMPT = """
 You are an expert SAP BTP migration engineer.
-Your task is to inspect a SAP Neo project and generate a migration plan for Cloud Foundry (CF).
+Your task is to inspect any given SAP Neo project and generate a complete migration plan for Cloud Foundry (CF).
 
 Return **only valid JSON** in the following format:
 
 {
   "plan": [
     {
-      "file": "<Neo relative path>",
+      "file": "<relative path of file or directory in the Neo project>",
       "reason": "<why this file/folder requires migration or special handling>",
-      "action": "<one of: convert_mta | convert_manifest | convert_xsapp | convert_ui5 | copy_as_is | manual_review>",
-      "snippets": "<short snippet of file content or first few lines>",
-      "target": "<CF target path>"
+      "action": "<the migration action chosen by you based on file type, content, and role in the project>",
+      "snippets": "<short snippet of file content (max 2000 characters) or '<directory>' for folders>",
+      "target": "<target path in Cloud Foundry>"
     }
   ]
 }
 
 Rules:
-1. Include all files and folders that are relevant for migration. 
-2. Decide the `action` based on the file type, purpose, and role in the Neo project.
-3. `snippets` should summarize the content of the file (a few lines).
-4. `target` should indicate the appropriate path in CF after migration.
-5. Never include explanations, markdown, or any text outside of the JSON.
-6. Make the plan complete and consistent, even for files or folders not explicitly mentioned.
+1. Inspect all files and directories dynamically; do not assume any specific file names or folder structure.
+2. Decide the 'action' automatically for each file or directory based on its type, purpose, and role in the Neo project.
+   Valid actions include: convert_mta, convert_manifest, convert_xsapp, convert_ui5, copy_as_is, manual_review.
+3. Include all files and directories relevant for migration, even if they require manual review or special handling.
+4. For directories, set 'snippets' to '<directory>'.
+5. 'snippets' should summarize the first few lines or first 2000 characters of content.
+6. 'target' should indicate the correct Cloud Foundry deployment path.
+7. Never include explanations, markdown, or text outside the JSON.
+8. Ensure the plan is complete and consistent, including entries for files or folders that might not be obvious.
+9. Prioritize correctness over completeness if you are unsure about a file; mark it for manual review.
 
 Output must be **strictly parseable JSON**.
 """
+
 
 def gather_repo_files(repo_dir: str, max_chars=2000):
     filenames = []

@@ -1,148 +1,148 @@
 {
   "plan": [
     {
-      "file": "neo-app.json",
-      "reason": "Contains Neo-specific routes and configuration; must be converted to xs-app.json for CF.",
-      "action": "convert_xsapp",
-      "snippets": "{ \"welcomeFile\": \"/index.html\", \"routes\": [ ... ] }",
-      "target": "xs-app.json"
-    },
-    {
-      "file": "manifest.json",
-      "reason": "UI5 application manifest; review for CF compatibility and reference in mta.yaml.",
-      "action": "convert_mta",
-      "snippets": "{ \"_version\": \"1.12.0\", \"sap.app\": { ... } }",
-      "target": "webapp/manifest.json"
-    },
-    {
-      "file": "manifest-bundle.zip",
-      "reason": "Neo deployment artifact; not needed for CF, manual review for any custom content.",
-      "action": "manual_review",
-      "snippets": "PK\u0003\u0004\u0014\u0000\u0000\b\b\u0000r;Uyx ...",
-      "target": null
-    },
-    {
-      "file": "index.html",
-      "reason": "UI5 app entry point; update resource paths for CF deployment.",
-      "action": "convert_ui5",
-      "snippets": "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"utf-8\">...",
-      "target": "webapp/index.html"
-    },
-    {
-      "file": "Component.js",
-      "reason": "Main UI5 component; copy as is unless CF-specific changes are needed.",
-      "action": "copy_as_is",
-      "snippets": "sap.ui.define([\"sap/ui/core/UIComponent\", ...",
-      "target": "webapp/Component.js"
-    },
-    {
-      "file": "Component-preload.js",
-      "reason": "UI5 preload bundle; regenerate in CF build pipeline.",
-      "action": "manual_review",
-      "snippets": "//@ui5-bundle sierra/pra/PRA_Custom/Component-preload.js ...",
-      "target": null
-    },
-    {
-      "file": "Component-dbg.js",
-      "reason": "Debug version of main component; not needed in CF production, manual review.",
-      "action": "manual_review",
-      "snippets": "sap.ui.define([\n\t\"sap/ui/core/UIComponent\", ...",
-      "target": null
-    },
-    {
       "file": "controller",
-      "reason": "Contains UI5 controller logic; copy as is.",
+      "reason": "Contains all UI5 controller logic for the application; required for migration.",
       "action": "copy_as_is",
       "snippets": "<directory>",
       "target": "webapp/controller"
     },
     {
       "file": "css",
-      "reason": "Custom styles for UI5 app; copy as is.",
+      "reason": "Contains custom styles for the UI5 application.",
       "action": "copy_as_is",
       "snippets": "<directory>",
       "target": "webapp/css"
     },
     {
       "file": "i18n",
-      "reason": "Internationalization resources; copy as is.",
+      "reason": "Contains internationalization resources referenced in manifest.json.",
       "action": "copy_as_is",
       "snippets": "<directory>",
       "target": "webapp/i18n"
     },
     {
       "file": "localService",
-      "reason": "OData metadata for mock server; copy as is for local testing.",
+      "reason": "Contains OData metadata for local mock server; referenced in manifest.json.",
       "action": "copy_as_is",
       "snippets": "<directory>",
       "target": "webapp/localService"
     },
     {
       "file": "model",
-      "reason": "UI5 models and data; copy as is.",
+      "reason": "Contains model definitions and mock data for the application.",
       "action": "copy_as_is",
       "snippets": "<directory>",
       "target": "webapp/model"
     },
     {
       "file": "resources",
-      "reason": "App resources and version info; copy as is.",
+      "reason": "Contains SAPUI5 resources and version info; may be referenced by index.html.",
       "action": "copy_as_is",
       "snippets": "<directory>",
       "target": "webapp/resources"
     },
     {
       "file": "test",
-      "reason": "Unit and integration tests; copy as is for CF test pipeline.",
+      "reason": "Contains unit and integration tests for the application.",
       "action": "copy_as_is",
       "snippets": "<directory>",
       "target": "webapp/test"
     },
     {
       "file": "view",
-      "reason": "UI5 XML views and fragments; copy as is.",
+      "reason": "Contains all XML views and fragments for the UI5 application.",
       "action": "copy_as_is",
       "snippets": "<directory>",
       "target": "webapp/view"
     },
     {
-      "file": "di.code-validation.core_issues.json",
-      "reason": "Code validation results; not needed in CF, manual review.",
-      "action": "manual_review",
-      "snippets": "{\"version\":\"1.0.0\",\"results\":{...}",
-      "target": null
-    },
-    {
-      "file": "resources.json",
-      "reason": "Resource manifest; manual review for CF relevance.",
-      "action": "manual_review",
-      "snippets": "{ \"resources\": [ ... ] }",
-      "target": null
-    },
-    {
-      "file": "revenue_data.json",
-      "reason": "Sample/mock data; copy as is for local testing.",
+      "file": "Component-dbg.js",
+      "reason": "Debug version of the main UI5 component; not required for production but may be useful for troubleshooting.",
       "action": "copy_as_is",
-      "snippets": "{\n\t\t\"results\": [{\n\t\t\t\"__metadata\": { ... }",
-      "target": "webapp/revenue_data.json"
+      "snippets": "sap.ui.define([\n\t\"sap/ui/core/UIComponent\",\n\t\"sap/ui/Device\",\n\t\"sierra/pra/PRA_Custom/model/models\"\n], function (UIComponent, Device, models) { ...",
+      "target": "webapp/Component-dbg.js"
     },
     {
-      "file": "sap-ui-cachebuster-info.json",
-      "reason": "UI5 cachebuster info; regenerate in CF build pipeline.",
+      "file": "Component-preload.js",
+      "reason": "Preload bundle for UI5; generated artifact, may be regenerated in CF build pipeline.",
       "action": "manual_review",
-      "snippets": "{\n  \"test/integration/arrangements/Startup-dbg.js\": ...",
+      "snippets": "//@ui5-bundle sierra/pra/PRA_Custom/Component-preload.js\njQuery.sap.registerPreloadedModules({ ...",
       "target": null
+    },
+    {
+      "file": "Component.js",
+      "reason": "Main UI5 component definition; required for application bootstrap.",
+      "action": "copy_as_is",
+      "snippets": "sap.ui.define([\"sap/ui/core/UIComponent\",\"sap/ui/Device\",\"sierra/pra/PRA_Custom/model/models\"],function(t,e,a){ ...",
+      "target": "webapp/Component.js"
+    },
+    {
+      "file": "di.code-validation.core_issues.json",
+      "reason": "Contains code validation results; not required for deployment but may be useful for code quality review.",
+      "action": "manual_review",
+      "snippets": "{\"version\":\"1.0.0\",\"results\":{\"@sap/di.code-validation.js\":{\"issues\":{\"serviceBinding.js\":[{\"category\":\"Possible Error\" ...",
+      "target": null
+    },
+    {
+      "file": "index.html",
+      "reason": "Main entry point for the UI5 application; required for CF deployment.",
+      "action": "copy_as_is",
+      "snippets": "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"utf-8\">\n\t    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> ...",
+      "target": "webapp/index.html"
+    },
+    {
+      "file": "manifest-bundle.zip",
+      "reason": "Neo deployment artifact; not required for Cloud Foundry. Needs manual review for any custom content.",
+      "action": "manual_review",
+      "snippets": "PK\u0003\u0004\u0014\u0000\u0000\b\b\u0000r;Uyx ...",
+      "target": null
+    },
+    {
+      "file": "manifest.json",
+      "reason": "UI5 application descriptor; must be reviewed and possibly adapted for CF (e.g., destinations, dataSources).",
+      "action": "convert_mta",
+      "snippets": "{\n    \"_version\": \"1.12.0\",\n    \"sap.app\": {\n        \"id\": \"sierra.pra.PRA_Custom\", ...",
+      "target": "webapp/manifest.json"
+    },
+    {
+      "file": "neo-app.json",
+      "reason": "Neo-specific routing and destination configuration; must be converted to xs-app.json for CF.",
+      "action": "convert_xsapp",
+      "snippets": "{\n  \"welcomeFile\": \"/index.html\",\n  \"routes\": [\n    {\n      \"path\": \"/resources\", ...",
+      "target": "xs-app.json"
     },
     {
       "file": "plan_migration_return.txt",
-      "reason": "Migration plan artifact; not needed in CF.",
+      "reason": "Previous migration plan output; not required for deployment.",
       "action": "manual_review",
       "snippets": "{\n  \"plan\": [\n    {\n      \"file\": \"neo-app.json\", ...",
       "target": null
     },
     {
+      "file": "resources.json",
+      "reason": "Resource manifest; may be used for cache busting or build tools. Needs review for CF relevance.",
+      "action": "manual_review",
+      "snippets": "{\n    \"resources\": [\n        {\n            \"name\": \"view/doi_header_add.fragment.xml\" ...",
+      "target": null
+    },
+    {
+      "file": "revenue_data.json",
+      "reason": "Mock data for OData service; useful for local testing and mock server.",
+      "action": "copy_as_is",
+      "snippets": "{\n\t\t\"results\": [{\n\t\t\t\"__metadata\": {\n\t\t\t\t\"id\": \"https://webidetesting9375760-h9110f098.dispatcher.us3.hana.ondemand.com/sap/opu/odata/SAP/ZPRA_REVENUE_SRV_01/Revenue_HDRSet('214754')\", ...",
+      "target": "webapp/revenue_data.json"
+    },
+    {
+      "file": "sap-ui-cachebuster-info.json",
+      "reason": "Cache buster info for UI5 resources; may be regenerated in CF build pipeline.",
+      "action": "manual_review",
+      "snippets": "{\n  \"test/integration/arrangements/Startup-dbg.js\": 1664278886000, ...",
+      "target": null
+    },
+    {
       "file": "_gather_return.txt",
-      "reason": "Gathered file list; not needed in CF.",
+      "reason": "Temporary or log file; not required for deployment.",
       "action": "manual_review",
       "snippets": "{\n  \"filenames\": [\n    \"Component-dbg.js\", ...",
       "target": null

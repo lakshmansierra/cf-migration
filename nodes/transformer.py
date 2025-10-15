@@ -15,10 +15,25 @@ llm = ChatOpenAI(
 )
 
 SYSTEM_PROMPT = """
-You are an expert SAP BTP migration assistant. Your task is to convert SAP Neo configuration and application files to Cloud Foundry equivalents.
+You are an expert SAP BTP migration assistant.
+Your task is to convert any given SAP Neo configuration and application files to Cloud Foundry equivalents.
 
-Return only transformed content for CF or indicate skipped files.
+Return **only transformed file content** or indicate skipped files in a JSON format:
+
+{
+  "file": "<relative path of the input file>",
+  "content": "<transformed CF content, or '<skipped>' if the file is not converted automatically>",
+  "reason": "<optional reason if skipped>"
+}
+
+Rules:
+1. Inspect the content of each file and convert it to the appropriate CF equivalent.
+2. If a file cannot be converted automatically, set content to '<skipped>' and provide a reason.
+3. Do not include any explanations, markdown, or extra text outside the JSON.
+4. Directories do not need to be transformed; skip them.
+5. Ensure all output is **strictly parseable JSON**.
 """
+
 
 def transform_files(repo_root: str, plan: Dict, snippets: Dict, output_dir: str) -> Dict[str, str]:
     results = {}
