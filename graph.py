@@ -3,10 +3,11 @@ from utils.file_ops import read_text_file
 from nodes.planner import plan_migration
 from nodes.transformer import transform_files
 from nodes.writer import write_output
+import os
 
 def run_migration(source_repo: str, output_dir: str) -> Dict[str, Any]:
     print(" Planning migration...")
-    plan, snippets = plan_migration(source_repo, output_dir)
+    plan, snippets = plan_migration(source_repo)
     if not plan:
         print(" No migration plan generated.")
         return None

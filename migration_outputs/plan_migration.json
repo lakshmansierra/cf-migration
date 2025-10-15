@@ -1,0 +1,151 @@
+{
+  "plan": [
+    {
+      "file": "neo-app.json",
+      "reason": "Neo routing must be replaced with CF approuter configuration. Routes and destinations need to be migrated to xs-app.json and managed approuter.",
+      "action": "convert_xsapp",
+      "snippets": "{ \"welcomeFile\": \"/index.html\", \"routes\": [ ... ] }",
+      "target": "xs-app.json"
+    },
+    {
+      "file": "manifest.json",
+      "reason": "UI5 app manifest must be reviewed for CF compatibility. DataSources and destinations need to be mapped to CF destinations. Ensure 'uri' points to a destination in CF and not a direct backend path.",
+      "action": "convert_manifest",
+      "snippets": "{ \"sap.app\": { \"dataSources\": { \"ZPRA_REVENUE_SRV_01\": { \"uri\": \"/sap/opu/odata/sap/ZPRA_REVENUE_SRV_01/\", ... } } } }",
+      "target": "webapp/manifest.json"
+    },
+    {
+      "file": "index.html",
+      "reason": "Entry point for UI5 app. Needs to be placed in HTML5 Application Repository for CF. Ensure resource paths and bootstrap are compatible with CF deployment.",
+      "action": "convert_ui5",
+      "snippets": "<!DOCTYPE html> ... <script id=\"sap-ui-bootstrap\" src=\"resources/sap-ui-core.js\" ... >",
+      "target": "webapp/index.html"
+    },
+    {
+      "file": "Component.js",
+      "reason": "Main UI5 component logic. Should be copied to CF webapp as is unless Neo-specific APIs are detected.",
+      "action": "copy_as_is",
+      "snippets": "sap.ui.define([\"sap/ui/core/UIComponent\", ...], function(...) { ... });",
+      "target": "webapp/Component.js"
+    },
+    {
+      "file": "Component-preload.js",
+      "reason": "UI5 preload bundle for performance. Should be regenerated in CF build pipeline, but can be copied for initial migration.",
+      "action": "copy_as_is",
+      "snippets": "//@ui5-bundle ...",
+      "target": "webapp/Component-preload.js"
+    },
+    {
+      "file": "Component-dbg.js",
+      "reason": "Debug version of main component. Not required for production, but can be copied for development/testing.",
+      "action": "copy_as_is",
+      "snippets": "sap.ui.define([ ... ], function(...) { ... });",
+      "target": "webapp/Component-dbg.js"
+    },
+    {
+      "file": "controller",
+      "reason": "Contains UI5 controller logic. Should be copied to CF webapp unless Neo-specific APIs are detected.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/controller"
+    },
+    {
+      "file": "css",
+      "reason": "Custom styles for UI5 app. Should be copied to CF webapp.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/css"
+    },
+    {
+      "file": "i18n",
+      "reason": "Internationalization resources. Should be copied to CF webapp.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/i18n"
+    },
+    {
+      "file": "localService",
+      "reason": "OData metadata and mock data for local testing. Should be copied for development, but not required in production.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/localService"
+    },
+    {
+      "file": "model",
+      "reason": "UI5 model logic and data. Should be copied to CF webapp.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/model"
+    },
+    {
+      "file": "resources",
+      "reason": "App resources and version info. Should be copied to CF webapp.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/resources"
+    },
+    {
+      "file": "view",
+      "reason": "UI5 XML views and fragments. Should be copied to CF webapp.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/view"
+    },
+    {
+      "file": "test",
+      "reason": "Unit and integration tests. Should be copied to CF webapp for continued test coverage.",
+      "action": "copy_as_is",
+      "snippets": "<directory>",
+      "target": "webapp/test"
+    },
+    {
+      "file": "di.code-validation.core_issues.json",
+      "reason": "Code validation results. Useful for migration QA but not required in production.",
+      "action": "manual_review",
+      "snippets": "{\"version\":\"1.0.0\",\"results\":{...}}",
+      "target": "webapp/di.code-validation.core_issues.json"
+    },
+    {
+      "file": "manifest-bundle.zip",
+      "reason": "Bundled manifest and i18n for UI5. Should be regenerated in CF build pipeline, but can be copied for initial migration.",
+      "action": "copy_as_is",
+      "snippets": "PK...manifest.json...i18n/i18n.properties...",
+      "target": "webapp/manifest-bundle.zip"
+    },
+    {
+      "file": "plan_migration.json",
+      "reason": "Migration plan artifact. Not part of runtime app, but useful for migration tracking.",
+      "action": "manual_review",
+      "snippets": "{ \"plan\": [ ... ] }",
+      "target": "webapp/plan_migration.json"
+    },
+    {
+      "file": "resources.json",
+      "reason": "Resource manifest for build or deployment. Should be reviewed for CF compatibility.",
+      "action": "manual_review",
+      "snippets": "{ \"resources\": [ ... ] }",
+      "target": "webapp/resources.json"
+    },
+    {
+      "file": "revenue_data.json",
+      "reason": "Sample or mock data for development/testing. Should be copied for development, but not required in production.",
+      "action": "copy_as_is",
+      "snippets": "{ \"results\": [ ... ] }",
+      "target": "webapp/revenue_data.json"
+    },
+    {
+      "file": "sap-ui-cachebuster-info.json",
+      "reason": "UI5 cachebuster info. Should be regenerated in CF build pipeline, but can be copied for initial migration.",
+      "action": "copy_as_is",
+      "snippets": "{ \"test/integration/arrangements/Startup-dbg.js\": ... }",
+      "target": "webapp/sap-ui-cachebuster-info.json"
+    },
+    {
+      "file": "_gather_return.txt",
+      "reason": "Gathered file list artifact. Not part of runtime app, but useful for migration tracking.",
+      "action": "manual_review",
+      "snippets": "{ \"filenames\": [ ... ] }",
+      "target": "webapp/_gather_return.txt"
+    }
+  ]
+}
