@@ -110,20 +110,15 @@ def transform_files(repo_root: str, plan_items: list, app_name: str) -> Dict[str
     # ------------------------
     # Save results (JSON + TXT)
     # ------------------------
-    json_path = os.path.join(repo_root, "transform_files_return.json")
-    txt_path = os.path.join(repo_root, "transform_files_return.txt")
-
-    # Save structured JSON
+       # ------------------------
+    # Save only structured JSON output
+    # ------------------------
+    json_path = os.path.join(os.getcwd(), "transform_files_return.json")
     save_dict_to_file(results, json_path)
 
-    # Save readable TXT version
-    with open(txt_path, "w", encoding="utf-8") as f:
-        for target, content in results.items():
-            f.write(f"=== {target} ===\n{content}\n\n")
-
-    print(f"✅ Transformer outputs saved to:\n - {json_path}\n - {txt_path}")
-
+    print(f"✅ Transformer JSON output saved to: {json_path}")
     return results
+
 
 # ------------------------
 # Save transformed files to disk

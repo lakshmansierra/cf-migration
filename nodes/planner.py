@@ -138,5 +138,5 @@ def plan_migration(repo_root: str) -> Tuple[dict, dict]:
         print("⚠️ AI returned invalid JSON. Saving raw response instead.")
         plan = {"error": "invalid_json", "raw_response": ai_response}
 
-    save_dict_to_file(plan, os.path.join(repo_root, "plan_migration.json"))
+    save_dict_to_file(plan, os.path.join(os.getcwd(), "plan_migration.json"))
     return plan, snippets
