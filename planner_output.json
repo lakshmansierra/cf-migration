@@ -16,567 +16,574 @@
     },
     {
       "file": "Component.js",
-      "reason": "Main UI5 component entry point, required for application bootstrap.",
+      "reason": "Main UI5 component definition, entry point for the application.",
       "action": "copy",
       "snippets": "sap.ui.define([\"sap/ui/core/UIComponent\",\"sap/ui/Device\",\"sierra/pra/PRA_Custom/model/models\"],function(t,e,a){",
       "target": "webapp/Component.js"
     },
     {
       "file": "di.code-validation.core_issues.json",
-      "reason": "Code validation report, not required for runtime or deployment.",
+      "reason": "Code validation report, contains linting and architectural issues.",
       "action": "ignore",
-      "snippets": "{\"version\":\"1.0.0\",\"results\":{\"@sap/di.code-validation.js\":{\"issues\":",
+      "snippets": "{\"version\":\"1.0.0\",\"results\":{\"@sap/di.code-validation.js\":{\"issues\":{",
       "target": ""
     },
     {
       "file": "index.html",
-      "reason": "Application entry HTML file, required for UI5 app launch in CF.",
+      "reason": "Application entry HTML file, bootstraps the UI5 app.",
       "action": "adapt",
       "snippets": "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"utf-8\">",
       "target": "webapp/index.html"
     },
     {
       "file": "manifest-bundle.zip",
-      "reason": "Bundled manifest and i18n files, possibly for deployment or packaging.",
-      "action": "manual_review",
+      "reason": "Bundle containing manifest and i18n files, used for deployment packaging.",
+      "action": "ignore",
       "snippets": "PK\u0003\u0004\u0014\u0000\u0000\b\b\u0000r;Uyx \u0004\u0000\u0000\u001a\u0000\u0000\n\u0000\u0000\u0000manifest.jsonYms6\u0010_q\u0004S$IIn\bvn<^@WYre\u001ce6E\u0002SLfz޼?=\n2~|",
-      "target": "webapp/manifest-bundle.zip"
+      "target": ""
     },
     {
       "file": "manifest.json",
-      "reason": "UI5 application descriptor, required for app configuration and routing.",
-      "action": "copy",
+      "reason": "UI5 application descriptor, defines app metadata, data sources, and configuration.",
+      "action": "transform",
       "snippets": "{\n    \"_version\": \"1.12.0\",\n    \"sap.app\": {\n        \"id\": \"sierra.pra.PRA_Custom\",",
       "target": "webapp/manifest.json"
     },
     {
       "file": "neo-app.json",
-      "reason": "Neo-specific routing and resource configuration, needs transformation to CF xs-app.json.",
+      "reason": "Neo environment routing and destination configuration, not compatible with CF.",
       "action": "transform",
       "snippets": "{\n  \"welcomeFile\": \"/index.html\",\n  \"routes\": [\n    {\n      \"path\": \"/resources\",",
-      "target": "webapp/xs-app.json"
+      "target": "cf-root/xs-app.json"
     },
     {
       "file": "resources.json",
-      "reason": "Resource manifest, used for cache busting or build tools, may need adaptation for CF build.",
-      "action": "manual_review",
+      "reason": "Resource manifest for build tools, lists app files and debug/merged status.",
+      "action": "ignore",
       "snippets": "{\n    \"resources\": [\n        {\n            \"name\": \"view/doi_header_add.fragment.xml\"",
-      "target": "webapp/resources.json"
+      "target": ""
     },
     {
       "file": "revenue_data.json",
-      "reason": "Sample or mock data for local development/testing, useful for localService in CF.",
+      "reason": "Sample/mock data for OData service, used for local testing.",
       "action": "copy",
-      "snippets": "{\n\t\t\"results\": [{\n\t\t\t\"__metadata\": {\n\t\t\t\t\"id\": \"https://webidetesting9375760-h9110f098.dispatcher.us3.hana.ondemand.com/sap/opu/odata/SAP/ZPRA_REVENUE_SRV_01/Revenue_HDRSet('214754')\"",
+      "snippets": "{\n\t\t\"results\": [{\n\t\t\t\"__metadata\": {\n\t\t\t\t\"id\": \"https://webidetesting9375760-h9110f098.dispatcher.us3.hana.ondemand.com/sap/opu/odata/SAP/ZPRA_REVENUE_SRV_01/Revenue_HDRSet('214754')\",",
       "target": "webapp/localService/revenue_data.json"
     },
     {
       "file": "sap-ui-cachebuster-info.json",
-      "reason": "Cache buster info for UI5 resources, may be handled by CF buildpack or UI5 tooling.",
-      "action": "manual_review",
+      "reason": "Cachebuster info for UI5 resources, used for static deployments.",
+      "action": "ignore",
       "snippets": "{\n  \"test/integration/arrangements/Startup-dbg.js\": 1664278886000,",
-      "target": "webapp/sap-ui-cachebuster-info.json"
+      "target": ""
+    },
+    {
+      "file": "_gather_return.txt",
+      "reason": "Internal file listing, not part of application runtime.",
+      "action": "ignore",
+      "snippets": "{\n  \"filenames\": [\n    \"Component-dbg.js\",",
+      "target": ""
     },
     {
       "file": "controller\\business_associate-dbg.controller.js",
-      "reason": "Debug version of controller, not needed for production deployment.",
+      "reason": "Debug version of business_associate controller, used for development.",
       "action": "ignore",
       "snippets": "/*global XLSX*/\nsap.ui.define([\n\t\"sap/ui/core/mvc/Controller\",",
       "target": ""
     },
     {
       "file": "controller\\business_associate.controller.js",
-      "reason": "Controller for business associate view, required for app logic.",
+      "reason": "Controller for business_associate view, contains business logic.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/core/Fragment\",\"sap/ui/model/json/JSONModel\",",
+      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/core/Fragment\",",
       "target": "webapp/controller/business_associate.controller.js"
     },
     {
       "file": "controller\\collective_doi-dbg.controller.js",
-      "reason": "Debug version of controller, not needed for production deployment.",
+      "reason": "Debug version of collective_doi controller, used for development.",
       "action": "ignore",
       "snippets": "/*global XLSX*/\nsap.ui.define([\n\t\"sap/ui/core/mvc/Controller\",",
       "target": ""
     },
     {
       "file": "controller\\collective_doi.controller.js",
-      "reason": "Controller for collective DOI view, required for app logic.",
+      "reason": "Controller for collective_doi view, contains business logic.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/core/Fragment\",\"sap/ui/model/json/JSONModel\",",
+      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/core/Fragment\",",
       "target": "webapp/controller/collective_doi.controller.js"
     },
     {
       "file": "controller\\jointventure-dbg.controller.js",
-      "reason": "Debug version of controller, not needed for production deployment.",
+      "reason": "Debug version of jointventure controller, used for development.",
       "action": "ignore",
       "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',\n\t'sap/ui/model/json/JSONModel',",
       "target": ""
     },
     {
       "file": "controller\\jointventure.controller.js",
-      "reason": "Controller for jointventure view, required for app logic.",
+      "reason": "Controller for jointventure view, contains business logic.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",\"sap/m/Label\",",
+      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",",
       "target": "webapp/controller/jointventure.controller.js"
     },
     {
       "file": "controller\\main-dbg.controller.js",
-      "reason": "Debug version of controller, not needed for production deployment.",
+      "reason": "Debug version of main controller, used for development.",
       "action": "ignore",
       "snippets": "sap.ui.define([\n\t\"sap/ui/core/mvc/Controller\",",
       "target": ""
     },
     {
       "file": "controller\\main.controller.js",
-      "reason": "Controller for main view, required for app logic.",
+      "reason": "Controller for main view, contains navigation and app logic.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/core/Fragment\",\"sap/ui/model/json/JSONModel\",",
+      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/core/Fragment\",",
       "target": "webapp/controller/main.controller.js"
     },
     {
       "file": "controller\\non-operated-dbg.controller.js",
-      "reason": "Debug version of controller, not needed for production deployment.",
+      "reason": "Debug version of non-operated controller, used for development.",
       "action": "ignore",
-      "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',\n\t'sap/ui/model/json/JSONModel',",
+      "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',",
       "target": ""
     },
     {
       "file": "controller\\non-operated.controller.js",
-      "reason": "Controller for non-operated view, required for app logic.",
+      "reason": "Controller for non-operated view, contains business logic.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",\"sap/m/Label\",",
+      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",",
       "target": "webapp/controller/non-operated.controller.js"
     },
     {
       "file": "controller\\owner_details-dbg.controller.js",
-      "reason": "Debug version of controller, not needed for production deployment.",
+      "reason": "Debug version of owner_details controller, used for development.",
       "action": "ignore",
-      "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',\n\t'sap/ui/model/json/JSONModel',",
+      "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',",
       "target": ""
     },
     {
       "file": "controller\\owner_details.controller.js",
-      "reason": "Controller for owner details view, required for app logic.",
+      "reason": "Controller for owner_details view, contains business logic.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",\"sap/m/Label\",",
+      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",",
       "target": "webapp/controller/owner_details.controller.js"
     },
     {
       "file": "controller\\payout-dbg.controller.js",
-      "reason": "Debug version of controller, not needed for production deployment.",
+      "reason": "Debug version of payout controller, used for development.",
       "action": "ignore",
-      "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',\n\t'sap/ui/model/json/JSONModel',",
+      "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',",
       "target": ""
     },
     {
       "file": "controller\\payout.controller.js",
-      "reason": "Controller for payout view, required for app logic.",
+      "reason": "Controller for payout view, contains business logic.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",\"sap/m/Label\",",
+      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",",
       "target": "webapp/controller/payout.controller.js"
     },
     {
       "file": "controller\\payout_position-dbg.controller.js",
-      "reason": "Debug version of controller, not needed for production deployment.",
+      "reason": "Debug version of payout_position controller, used for development.",
       "action": "ignore",
-      "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',\n\t'sap/ui/model/json/JSONModel',",
+      "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',",
       "target": ""
     },
     {
       "file": "controller\\payout_position.controller.js",
-      "reason": "Controller for payout position view, required for app logic.",
+      "reason": "Controller for payout_position view, contains business logic.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",\"sap/m/Label\",",
+      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",",
       "target": "webapp/controller/payout_position.controller.js"
     },
     {
       "file": "controller\\revenue_header-dbg.controller.js",
-      "reason": "Debug version of controller, not needed for production deployment.",
+      "reason": "Debug version of revenue_header controller, used for development.",
       "action": "ignore",
-      "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',\n\t'sap/ui/model/json/JSONModel',",
+      "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',",
       "target": ""
     },
     {
       "file": "controller\\revenue_header.controller.js",
-      "reason": "Controller for revenue header view, required for app logic.",
+      "reason": "Controller for revenue_header view, contains business logic.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",\"sap/m/Label\",",
+      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",",
       "target": "webapp/controller/revenue_header.controller.js"
     },
     {
       "file": "controller\\venture-dbg.controller.js",
-      "reason": "Debug version of controller, not needed for production deployment.",
+      "reason": "Debug version of venture controller, used for development.",
       "action": "ignore",
-      "snippets": "sap.ui.define([\n    'sap/ui/core/mvc/Controller',\n    'sap/ui/model/json/JSONModel',",
+      "snippets": "sap.ui.define([\n    'sap/ui/core/mvc/Controller',",
       "target": ""
     },
     {
       "file": "controller\\venture.controller.js",
-      "reason": "Controller for venture view, required for app logic.",
+      "reason": "Controller for venture view, contains business logic.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",\"sap/m/Label\",",
+      "snippets": "sap.ui.define([\"sap/ui/core/mvc/Controller\",\"sap/ui/model/json/JSONModel\",",
       "target": "webapp/controller/venture.controller.js"
     },
     {
       "file": "css\\style.css",
-      "reason": "Custom CSS for UI5 app, should be included in CF webapp resources.",
+      "reason": "Custom CSS styles for the application.",
       "action": "copy",
       "snippets": "/* Enter your custom styles here */",
       "target": "webapp/css/style.css"
     },
     {
       "file": "i18n\\i18n.properties",
-      "reason": "Internationalization resource bundle, required for UI5 localization.",
+      "reason": "Internationalization resource bundle for UI5 app.",
       "action": "copy",
       "snippets": "title=Sierra Extension for SAP PRA\nappTitle=Sierra PRA\nappDescription=sap-icon://loan",
       "target": "webapp/i18n/i18n.properties"
     },
     {
       "file": "localService\\metadata.xml",
-      "reason": "OData metadata for local mock server, useful for local development/testing in CF.",
+      "reason": "OData metadata for local mock server, used for development/testing.",
       "action": "copy",
       "snippets": "<edmx:Edmx xmlns:edmx=\"http://schemas.microsoft.com/ado/2007/06/edmx\"",
       "target": "webapp/localService/metadata.xml"
     },
     {
       "file": "model\\models-dbg.js",
-      "reason": "Debug version of model helper, not needed for production deployment.",
+      "reason": "Debug version of models.js, used for development.",
       "action": "ignore",
-      "snippets": "sap.ui.define([\n\t\"sap/ui/model/json/JSONModel\",\n\t\"sap/ui/Device\"\n], function (JSONModel, Device) {",
+      "snippets": "sap.ui.define([\n\t\"sap/ui/model/json/JSONModel\",",
       "target": ""
     },
     {
       "file": "model\\models.js",
-      "reason": "Model helper for device model, required for app logic.",
+      "reason": "Model factory for device model, used in UI5 app.",
       "action": "copy",
       "snippets": "sap.ui.define([\"sap/ui/model/json/JSONModel\",\"sap/ui/Device\"],function(e,n){",
       "target": "webapp/model/models.js"
     },
     {
       "file": "model\\provision.json",
-      "reason": "Provision data, likely used for mock or local data in the app.",
+      "reason": "Sample/mock data for provisions, used for local testing.",
       "action": "copy",
       "snippets": "{\n\t\"prov\": [{\n\t\t\t\"Account_ID\": \"6500.01\",",
-      "target": "webapp/model/provision.json"
+      "target": "webapp/localService/provision.json"
     },
     {
       "file": "resources\\sap-ui-version.json",
-      "reason": "UI5 version info, may be useful for diagnostics or build, but not required for runtime.",
-      "action": "manual_review",
-      "snippets": "{\n\t\"name\": \"PRA_Custom\",\n\t\"version\": \"0.0.1\",",
-      "target": "webapp/resources/sap-ui-version.json"
+      "reason": "UI5 build version info, not required for runtime.",
+      "action": "ignore",
+      "snippets": "{\n\t\"name\": \"PRA_Custom\",",
+      "target": ""
     },
     {
       "file": "test\\testsuite.qunit-dbg.js",
-      "reason": "Debug version of QUnit test suite, not needed for production deployment.",
+      "reason": "Debug version of QUnit test suite loader.",
       "action": "ignore",
       "snippets": "// eslint-disable-next-line sap-no-global-define\nwindow.suite = function () {",
       "target": ""
     },
     {
       "file": "test\\testsuite.qunit.html",
-      "reason": "QUnit test suite HTML, used for running unit tests in development.",
+      "reason": "HTML runner for QUnit test suite.",
       "action": "copy",
       "snippets": "<!DOCTYPE html>\n<html>\n<head>\n\t<title>QUnit test suite for Basic Template</title>",
       "target": "webapp/test/testsuite.qunit.html"
     },
     {
       "file": "test\\testsuite.qunit.js",
-      "reason": "QUnit test suite JS, used for running unit tests in development.",
+      "reason": "QUnit test suite loader script.",
       "action": "copy",
-      "snippets": "window.suite=function(){\"use strict\";var t=new parent.jsUnitTestSuite,n=location.pathname.substring(0,location.pathname.lastIndexOf(\"/\")+1);",
+      "snippets": "window.suite=function(){\"use strict\";var t=new parent.jsUnitTestSuite,",
       "target": "webapp/test/testsuite.qunit.js"
     },
     {
       "file": "test\\integration\\AllJourneys-dbg.js",
-      "reason": "Debug version of integration test, not needed for production deployment.",
+      "reason": "Debug version of integration test journey loader.",
       "action": "ignore",
-      "snippets": "sap.ui.define([\n\t\"sap/ui/test/Opa5\",\n\t\"./arrangements/Startup\",",
+      "snippets": "sap.ui.define([\n\t\"sap/ui/test/Opa5\",",
       "target": ""
     },
     {
       "file": "test\\integration\\AllJourneys.js",
-      "reason": "Integration test journey, used for automated UI testing.",
+      "reason": "Integration test journey loader.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sap/ui/test/Opa5\",\"./arrangements/Startup\",\"./NavigationJourney\"],function(e,a){",
+      "snippets": "sap.ui.define([\"sap/ui/test/Opa5\",\"./arrangements/Startup\",",
       "target": "webapp/test/integration/AllJourneys.js"
     },
     {
       "file": "test\\integration\\NavigationJourney-dbg.js",
-      "reason": "Debug version of navigation journey test, not needed for production deployment.",
+      "reason": "Debug version of navigation journey test.",
       "action": "ignore",
-      "snippets": "\t/*global QUnit*/\n\n\tsap.ui.define([\n\t\t\"sap/ui/test/opaQunit\",",
+      "snippets": "\t/*global QUnit*/\n\n\tsap.ui.define([",
       "target": ""
     },
     {
       "file": "test\\integration\\NavigationJourney.js",
-      "reason": "Navigation journey test, used for automated UI testing.",
+      "reason": "Navigation journey test for integration testing.",
       "action": "copy",
       "snippets": "sap.ui.define([\"sap/ui/test/opaQunit\",\"./pages/main\"],function(e){",
       "target": "webapp/test/integration/NavigationJourney.js"
     },
     {
       "file": "test\\integration\\opaTests.qunit-dbg.js",
-      "reason": "Debug version of OPA QUnit test, not needed for production deployment.",
+      "reason": "Debug version of OPA QUnit test runner.",
       "action": "ignore",
-      "snippets": "/* global QUnit */\nQUnit.config.autostart = false;\n\nsap.ui.getCore().attachInit(function () {",
+      "snippets": "/* global QUnit */\nQUnit.config.autostart = false;",
       "target": ""
     },
     {
       "file": "test\\integration\\opaTests.qunit.html",
-      "reason": "OPA QUnit test HTML, used for running integration tests in development.",
+      "reason": "HTML runner for OPA integration tests.",
       "action": "copy",
-      "snippets": "<!DOCTYPE html>\n<html>\n<head>\n\t<meta charset=\"utf-8\">\n\t<title>Integration tests for Basic Template</title>",
+      "snippets": "<!DOCTYPE html>\n<html>\n<head>\n\t<meta charset=\"utf-8\">",
       "target": "webapp/test/integration/opaTests.qunit.html"
     },
     {
       "file": "test\\integration\\opaTests.qunit.js",
-      "reason": "OPA QUnit test JS, used for running integration tests in development.",
+      "reason": "OPA QUnit test runner script.",
       "action": "copy",
       "snippets": "QUnit.config.autostart=false;sap.ui.getCore().attachInit(function(){",
       "target": "webapp/test/integration/opaTests.qunit.js"
     },
     {
       "file": "test\\integration\\arrangements\\Startup-dbg.js",
-      "reason": "Debug version of startup arrangement, not needed for production deployment.",
+      "reason": "Debug version of OPA startup arrangement.",
       "action": "ignore",
       "snippets": "sap.ui.define([\n\t\"sap/ui/test/Opa5\"\n], function (Opa5) {",
       "target": ""
     },
     {
       "file": "test\\integration\\arrangements\\Startup.js",
-      "reason": "Startup arrangement for integration tests.",
+      "reason": "OPA startup arrangement for integration tests.",
       "action": "copy",
       "snippets": "sap.ui.define([\"sap/ui/test/Opa5\"],function(t){",
       "target": "webapp/test/integration/arrangements/Startup.js"
     },
     {
       "file": "test\\integration\\pages\\main-dbg.js",
-      "reason": "Debug version of main page object for tests, not needed for production deployment.",
+      "reason": "Debug version of OPA page object for main view.",
       "action": "ignore",
       "snippets": "sap.ui.define([\n\t\"sap/ui/test/Opa5\"\n], function (Opa5) {",
       "target": ""
     },
     {
       "file": "test\\integration\\pages\\main.js",
-      "reason": "Main page object for integration tests.",
+      "reason": "OPA page object for main view.",
       "action": "copy",
       "snippets": "sap.ui.define([\"sap/ui/test/Opa5\"],function(e){",
       "target": "webapp/test/integration/pages/main.js"
     },
     {
       "file": "test\\unit\\AllTests-dbg.js",
-      "reason": "Debug version of unit test suite, not needed for production deployment.",
+      "reason": "Debug version of unit test loader.",
       "action": "ignore",
-      "snippets": "sap.ui.define([\n\t\"sierra/pra/PRA_Custom/test/unit/controller/main.controller\"\n], function () {",
+      "snippets": "sap.ui.define([\n\t\"sierra/pra/PRA_Custom/test/unit/controller/main.controller\"",
       "target": ""
     },
     {
       "file": "test\\unit\\AllTests.js",
-      "reason": "Unit test suite, used for automated unit testing.",
+      "reason": "Unit test loader.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sierra/pra/PRA_Custom/test/unit/controller/main.controller\"],function(){",
+      "snippets": "sap.ui.define([\"sierra/pra/PRA_Custom/test/unit/controller/main.controller\"],",
       "target": "webapp/test/unit/AllTests.js"
     },
     {
       "file": "test\\unit\\unitTests.qunit-dbg.js",
-      "reason": "Debug version of QUnit unit test, not needed for production deployment.",
+      "reason": "Debug version of QUnit unit test runner.",
       "action": "ignore",
-      "snippets": "/* global QUnit */\nQUnit.config.autostart = false;\n\nsap.ui.getCore().attachInit(function () {",
+      "snippets": "/* global QUnit */\nQUnit.config.autostart = false;",
       "target": ""
     },
     {
       "file": "test\\unit\\unitTests.qunit.html",
-      "reason": "QUnit unit test HTML, used for running unit tests in development.",
+      "reason": "HTML runner for QUnit unit tests.",
       "action": "copy",
-      "snippets": "<!DOCTYPE html>\n<html>\n<head>\n\t<meta charset=\"utf-8\">\n\t<title>Unit tests for sierra.pra.PRA_Custom</title>",
+      "snippets": "<!DOCTYPE html>\n<html>\n<head>\n\t<meta charset=\"utf-8\">",
       "target": "webapp/test/unit/unitTests.qunit.html"
     },
     {
       "file": "test\\unit\\unitTests.qunit.js",
-      "reason": "QUnit unit test JS, used for running unit tests in development.",
+      "reason": "QUnit unit test runner script.",
       "action": "copy",
       "snippets": "QUnit.config.autostart=false;sap.ui.getCore().attachInit(function(){",
       "target": "webapp/test/unit/unitTests.qunit.js"
     },
     {
       "file": "test\\unit\\controller\\main-dbg.controller.js",
-      "reason": "Debug version of main controller unit test, not needed for production deployment.",
+      "reason": "Debug version of unit test for main controller.",
       "action": "ignore",
-      "snippets": "/*global QUnit*/\n\nsap.ui.define([\n\t\"sierra/pra/PRA_Custom/controller/main.controller\"\n], function (Controller) {",
+      "snippets": "/*global QUnit*/\n\nsap.ui.define([\n\t\"sierra/pra/PRA_Custom/controller/main.controller\"",
       "target": ""
     },
     {
       "file": "test\\unit\\controller\\main.controller.js",
-      "reason": "Main controller unit test, used for automated unit testing.",
+      "reason": "Unit test for main controller.",
       "action": "copy",
       "snippets": "sap.ui.define([\"sierra/pra/PRA_Custom/controller/main.controller\"],function(n){",
       "target": "webapp/test/unit/controller/main.controller.js"
     },
     {
       "file": "view\\business_associate.view.xml",
-      "reason": "XML view for business associate, required for UI5 navigation and rendering.",
+      "reason": "XML view for business_associate, UI definition.",
       "action": "copy",
       "snippets": "<mvc:View\n\t\tcontrollerName=\"sierra.pra.PRA_Custom.controller.business_associate\"",
       "target": "webapp/view/business_associate.view.xml"
     },
     {
       "file": "view\\collective_doi.view.xml",
-      "reason": "XML view for collective DOI, required for UI5 navigation and rendering.",
+      "reason": "XML view for collective_doi, UI definition.",
       "action": "copy",
       "snippets": "<mvc:View\n\t\tcontrollerName=\"sierra.pra.PRA_Custom.controller.collective_doi\"",
       "target": "webapp/view/collective_doi.view.xml"
     },
     {
       "file": "view\\collective_doi_bearer_group.fragment.xml",
-      "reason": "Fragment for collective DOI bearer group dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for collective_doi bearer group dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/collective_doi_bearer_group.fragment.xml"
     },
     {
       "file": "view\\collective_doi_comments.fragment.xml",
-      "reason": "Fragment for collective DOI comments dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for collective_doi comments dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/collective_doi_comments.fragment.xml"
     },
     {
       "file": "view\\collective_doi_filter.fragment.xml",
-      "reason": "Fragment for collective DOI filter dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for collective_doi filter dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/collective_doi_filter.fragment.xml"
     },
     {
       "file": "view\\collective_doi_header_add.fragment.xml",
-      "reason": "Fragment for collective DOI header add dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for collective_doi header add dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/collective_doi_header_add.fragment.xml"
     },
     {
       "file": "view\\collective_doi_market_free.fragment.xml",
-      "reason": "Fragment for collective DOI market free dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for collective_doi market free dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/collective_doi_market_free.fragment.xml"
     },
     {
       "file": "view\\doi_header_add.fragment.xml",
-      "reason": "Fragment for DOI header add dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for DOI header add dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/doi_header_add.fragment.xml"
     },
     {
       "file": "view\\jointventure.view.xml",
-      "reason": "XML view for jointventure, required for UI5 navigation and rendering.",
+      "reason": "XML view for jointventure, UI definition.",
       "action": "copy",
       "snippets": "<mvc:View controllerName=\"sierra.pra.PRA_Custom.controller.jointventure\"",
       "target": "webapp/view/jointventure.view.xml"
     },
     {
       "file": "view\\jointventure_interest.fragment.xml",
-      "reason": "Fragment for jointventure interest dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for jointventure interest dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/jointventure_interest.fragment.xml"
     },
     {
       "file": "view\\main.view.xml",
-      "reason": "Main XML view, required for UI5 navigation and rendering.",
+      "reason": "Main XML view, defines app shell and navigation.",
       "action": "copy",
       "snippets": "<mvc:View class=\"sapUiSizeCompact\" controllerName=\"sierra.pra.PRA_Custom.controller.main\"",
       "target": "webapp/view/main.view.xml"
     },
     {
       "file": "view\\non-operated.view.xml",
-      "reason": "XML view for non-operated, required for UI5 navigation and rendering.",
+      "reason": "XML view for non-operated, UI definition.",
       "action": "copy",
       "snippets": "<mvc:View controllerName=\"sierra.pra.PRA_Custom.controller.non-operated\"",
       "target": "webapp/view/non-operated.view.xml"
     },
     {
       "file": "view\\non-operated_balance.fragment.xml",
-      "reason": "Fragment for non-operated balance dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for non-operated balance dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/non-operated_balance.fragment.xml"
     },
     {
       "file": "view\\non-operated_balance_upload.fragment.xml",
-      "reason": "Fragment for non-operated balance upload dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for non-operated balance upload dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/non-operated_balance_upload.fragment.xml"
     },
     {
       "file": "view\\owner_details.view.xml",
-      "reason": "XML view for owner details, required for UI5 navigation and rendering.",
+      "reason": "XML view for owner_details, UI definition.",
       "action": "copy",
       "snippets": "<mvc:View controllerName=\"sierra.pra.PRA_Custom.controller.payout_position\"",
       "target": "webapp/view/owner_details.view.xml"
     },
     {
       "file": "view\\payout.view.xml",
-      "reason": "XML view for payout, required for UI5 navigation and rendering.",
+      "reason": "XML view for payout, UI definition.",
       "action": "copy",
       "snippets": "<mvc:View controllerName=\"sierra.pra.PRA_Custom.controller.payout\"",
       "target": "webapp/view/payout.view.xml"
     },
     {
       "file": "view\\payout_add.fragment.xml",
-      "reason": "Fragment for payout add dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for payout add dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/payout_add.fragment.xml"
     },
     {
       "file": "view\\payout_baladj.fragment.xml",
-      "reason": "Fragment for payout balance adjustment dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for payout balance adjustment dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/payout_baladj.fragment.xml"
     },
     {
       "file": "view\\payout_costcenter.fragment.xml",
-      "reason": "Fragment for payout cost center dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for payout cost center dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/payout_costcenter.fragment.xml"
     },
     {
       "file": "view\\payout_position.view.xml",
-      "reason": "XML view for payout position, required for UI5 navigation and rendering.",
+      "reason": "XML view for payout_position, UI definition.",
       "action": "copy",
       "snippets": "<mvc:View controllerName=\"sierra.pra.PRA_Custom.controller.payout_position\"",
       "target": "webapp/view/payout_position.view.xml"
     },
     {
       "file": "view\\payout_provisions.fragment.xml",
-      "reason": "Fragment for payout provisions dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for payout provisions dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/payout_provisions.fragment.xml"
     },
     {
       "file": "view\\revenue_header.view.xml",
-      "reason": "XML view for revenue header, required for UI5 navigation and rendering.",
+      "reason": "XML view for revenue_header, UI definition.",
       "action": "copy",
       "snippets": "<mvc:View\n\t\tcontrollerName=\"sierra.pra.PRA_Custom.controller.revenue_header\"",
       "target": "webapp/view/revenue_header.view.xml"
     },
     {
       "file": "view\\venture.view.xml",
-      "reason": "XML view for venture, required for UI5 navigation and rendering.",
+      "reason": "XML view for venture, UI definition.",
       "action": "copy",
       "snippets": "<mvc:View\n\t\tcontrollerName=\"sierra.pra.PRA_Custom.controller.venture\"",
       "target": "webapp/view/venture.view.xml"
     },
     {
       "file": "view\\venture_filter.fragment.xml",
-      "reason": "Fragment for venture filter dialog, used in UI5 for modular dialogs.",
+      "reason": "Fragment for venture filter dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/venture_filter.fragment.xml"

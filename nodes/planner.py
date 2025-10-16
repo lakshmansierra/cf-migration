@@ -92,48 +92,56 @@ llm = ChatOpenAI(deployment_id=LLM_DEPLOYMENT_ID, temperature=0)
 
 
 # ------------------------
-# Call LLM via SAP AI Core
-# ------------------------
-def call_llm(prompt: str) -> str:
-    messages = [
-        SystemMessage(content=SYSTEM_PROMPT),
-        HumanMessage(content=prompt),
-    ]
-    try:
-        response = llm.invoke(messages)
-        return response.content
-    except Exception as e:
-        return json.dumps({"error": f"llm_call_failed: {str(e)}"})
-
-
-# ------------------------
 # Generate Migration Plan
 # ------------------------
-def plan_migration(repo_root: str) -> Tuple[dict, dict]:
+def plan_migration(repo_root: str) -> Dict[str, Any]:
+    """
+    Analyze the given SAP Neo repo and generate a Cloud Foundry migration plan using the LLM.
+    Prints the LLM output, saves it to planner_output.json, and returns the parsed plan dictionary.
+    """
+    # Gather repo file names and snippets for context
     filenames, snippets = gather_repo_files(repo_root)
 
-    # Build prompt dynamically
-    prompt = "Here are the files in my SAP Neo project:\n"
-    prompt += json.dumps(filenames, indent=2)
-    prompt += "\n\nHere are short snippets from these files:\n"
-    prompt += json.dumps(snippets, indent=2)
-    prompt += "\n\nPlease generate a complete JSON migration plan as described in the system prompt."
+    payload = {
+        "filenames": filenames,
+        "snippets": snippets
+    }
 
-    print("\n🧠 Calling SAP AI Core LLM to create migration plan...")
-    ai_response = call_llm(prompt)
+    save_dict_to_file(payload, os.path.join(repo_root, "_gather_return.txt"))
 
-        # Print AI response in terminal
-    print("\n🧾 AI Response preview:\n", ai_response)
+    # Build prompt for LLM (SYSTEM_PROMPT is already defined globally)
+    prompt_obj = {
+        "instructions": SYSTEM_PROMPT,
+        "filenames": filenames,
+        "snippets": snippets
+    }
+    prompt = json.dumps(prompt_obj, indent=2)
 
-    # Parse JSON response
+    print("🧠 Calling LLM (Planner) to generate migration plan...")
     try:
-        plan = json.loads(ai_response)
-        print("✅ AI returned a valid migration plan.")
-    except json.JSONDecodeError:
-        print("⚠️ AI returned invalid JSON. Using raw response instead.")
-        plan = {"error": "invalid_json", "raw_response": ai_response}
+        # Call the model
+        resp = llm.invoke([HumanMessage(content=prompt)])
+        raw_content = getattr(resp, "content", str(resp))
 
-    # Save parsed plan to current working directory
-    save_dict_to_file(plan, os.path.join(os.getcwd(), "plan_migration.json"))
-    return plan, snippets    
+        print("\n📥 Raw LLM (Planner) Response:")
+        print(raw_content)
+
+        # Parse LLM JSON output
+        parsed = json.loads(raw_content)
+        if "plan" in parsed and isinstance(parsed["plan"], list):
+            print(f"✅ Planner generated {len(parsed['plan'])} migration items.")
+        else:
+            print("⚠️ Planner output missing 'plan' key or invalid structure.")
+            parsed = {"plan": []}
+
+        # Save JSON output in the CWD
+        output_path = os.path.join(os.getcwd(), "planner_output.json")
+        save_dict_to_file(parsed, output_path)
+        print(f"📄 Planner output saved to: {output_path}")
+
+        return parsed
+
+    except Exception as e:
+        print(f"❌ Planner failed: {e}")
+        return {"plan": []}
 

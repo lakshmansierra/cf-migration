@@ -2,7 +2,7 @@ import os
 import json
 from typing import Dict, Any
 from gen_ai_hub.proxy.langchain.openai import ChatOpenAI
-from langchain.schema import HumanMessage, SystemMessage
+from langchain.schema import HumanMessage
     
 from utils.file_ops import read_text_file, save_dict_to_file
 
@@ -40,92 +40,141 @@ You will receive a JSON object that contains:
   "file_content": "<the full text content of the file>"
 }
 
-Your goal:
-- Use the plan details and file content to produce the transformed file content automatically.
-- Follow the intent described in the plan (reason + action + target).
-- You do not need to follow predefined migration rules; instead, infer what’s appropriate from the data itself.
-- Decide the final directory or file structure using the 'target' field, unless a better location is clear from context.
+---
 
-Return a **single JSON object only**, with this structure:
+### 🎯 Your Goal
+- Use the migration plan details and `file_content` to automatically produce the transformed CF-compatible file.
+- Follow the intent described by the `reason`, `action`, and `target` fields.
+- You do **not** need to follow fixed migration templates — infer what is appropriate from the data itself.
+- Use the `target` field to decide the output file location, unless a better structure is clearly implied by context.
+
+---
+
+### 📦 Expected Output
+Return a **single valid JSON object only**, structured as:
 
 {
   "target_path": "<final relative path where the converted file should be stored>",
   "converted_content": "<string - new file content>",
   "encoding": "utf-8",
-  "notes": "<optional - any reasoning or manual steps>",
+  "notes": "<optional - reasoning or manual steps>",
   "error": "<optional - only if something prevents conversion>"
 }
 
-Guidelines:
-- Always preserve intent and functionality of the original file.
-- If you are unsure, return an error with a short note explaining why.
-- Output must be valid JSON — no text before or after it.
+---
+
+### 🧠 Transformation Rules
+1. Always preserve the **intent and functionality** of the original file.
+2. If uncertain about how to transform, provide an `"error"` with a brief explanation.
+3. The output **must be valid JSON only** — no commentary or markdown.
+
+---
+
+### ⚙️ Additional Rule: Add Dependencies Based on Project Purpose
+- Analyze the `reason`, `snippets`, and `file_content` to **infer the project’s purpose**  
+  (e.g., UI app, Java backend, Node.js service, MTA module, etc.).
+- Based on that analysis, **create or modify a dependency descriptor file** if it is missing or incomplete.
+- The dependency descriptor should match the project type and use an appropriate format:
+  - **Node.js apps:** `package.json`
+  - **Java projects:** `pom.xml`
+  - **Python apps:** `requirements.txt`
+  - **MTA or multi-module projects:** `mta.yaml`
+- If such a file already exists, update it logically rather than duplicating.
+- If a new one must be created, generate it under a relevant name and extension (e.g., `.json`, `.yaml`, `.xml`).
+
+---
+
+### 🧾 Example (for understanding only)
+If a `snippets` section contains Node.js imports or an `express` server:
+→ Generate or update a `package.json` file with necessary dependencies and scripts.
+
+If `file_content` references Maven, Spring Boot, or Java packages:
+→ Generate or update a `pom.xml` with matching dependencies and build plugins.
+
+---
+
+### 🚦 Output Reminder
+Return only **one JSON object** — no extra explanation or text outside the JSON.
 """
-
-
 
 # ------------------------
 # Initialize LLM
 # ------------------------
-llm = ChatOpenAI(deployment_id=LLM_DEPLOYMENT_ID, temperature=0.2)
+llm = ChatOpenAI(deployment_id=LLM_DEPLOYMENT_ID, temperature=0)
 
 
 # ------------------------
 # Transform files
 # ------------------------
-def transform_files(repo_root: str, plan_items: list, app_name: str) -> Dict[str, str]:
+def transform_files(repo_root: str, plan: Dict[str, Any]) -> Dict[str, str]:
+    """
+    Transform files according to the migration plan.
+    - Prints all transformer responses to terminal.
+    - Skips ignored/manual files.
+    - Saves output as transformer_output.json in CWD.
+    """
     results: Dict[str, str] = {}
-    items = plan_items  # plan_items is already a list
+    items = plan.get("plan", [])
 
-    for item in items:
-        src_rel = item["file"]
-        target_rel = item["target"]
-        action = item.get("action", "manual_review")
-        src_path = os.path.join(repo_root, src_rel)
+    print(f"\n🚀 Starting transformation of {len(items)} files...")
 
+    for i, item in enumerate(items, start=1):
+        rel = item.get("file")
+        target = item.get("target") or rel
+        action = (item.get("action") or "").lower()
+
+        # Skip ignored/manual_review actions
+        if action in {"ignore", "manual_review"}:
+            print(f"⏭️  [{i}] Skipping '{rel}' (action: {action})")
+            continue
+
+        src_path = os.path.join(repo_root, rel)
         if not os.path.exists(src_path):
-            results[target_rel] = f"# MISSING SOURCE FILE: {src_rel}\n"
+            print(f"⚠️  [{i}] Missing source file: {rel}")
+            results[target] = f"# MISSING SOURCE: {rel}\n"
             continue
 
         content = read_text_file(src_path)
-        payload = json.dumps({
-            "file_name": src_rel,
-            "action": action,
+        payload = {
+            "plan_item": item,
             "file_content": content,
-            "app_name": app_name
-        }, indent=2)
+            "instructions": SYSTEM_PROMPT
+        }
 
-        messages = [
-            SystemMessage(content=SYSTEM_PROMPT),
-            HumanMessage(content=payload)
-        ]
+        prompt = json.dumps(payload, indent=2)
+
+        print(f"\n🧠 [{i}] Transforming: {rel} → {target}")
+
         try:
-            response = llm.invoke(messages)
-            transformed_content = response.content
+            resp = llm.invoke([HumanMessage(content=prompt)])
+            raw_content = getattr(resp, "content", str(resp))
+            print(f"\n📥 Raw LLM response for {rel}:\n{raw_content}\n")
+
+            # Attempt to extract JSON from possibly wrapped output
+            start = raw_content.find("{")
+            end = raw_content.rfind("}") + 1
+            json_str = raw_content[start:end] if start != -1 and end > start else "{}"
+
+            parsed = json.loads(json_str)
+            converted = parsed.get("converted_content", "").strip()
+
+            if converted:
+                results[target] = converted
+                print(f"✅ [{i}] Transformed successfully.")
+            else:
+                results[target] = content  # fallback
+                print(f"⚠️ [{i}] Transformer returned empty content, using original file.")
+
         except Exception as e:
-            transformed_content = json.dumps({"error": f"llm_call_failed: {str(e)}"})
+            results[target] = f"# LLM FAILED: {str(e)}\n"
+            print(f"❌ [{i}] Transformer failed for {rel}: {e}")
 
-        results[target_rel] = transformed_content
+    # Save all results to transformer_output.json
+    output_path = os.path.join(os.getcwd(), "transformer_output.json")
+    save_dict_to_file(results, output_path)
+    print(f"\n📄 Transformer output saved to: {output_path}")
 
-    # ------------------------
-    # Save results (JSON + TXT)
-    # ------------------------
-       # ------------------------
-    # Save only structured JSON output
-    # ------------------------
-    json_path = os.path.join(os.getcwd(), "transform_files_return.json")
-    save_dict_to_file(results, json_path)
-
-    print(f"✅ Transformer JSON output saved to: {json_path}")
     return results
 
 
-# ------------------------
-# Save transformed files to disk
-# ------------------------
-def save_transformed_files(transformed: Dict[str, str], output_dir: str):
-    for rel_path, content in transformed.items():
-        out_path = os.path.join(output_dir, rel_path)
-        os.makedirs(os.path.dirname(out_path), exist_ok=True)
-        with open(out_path, "w", encoding="utf-8") as f:
-            f.write(content)
+
