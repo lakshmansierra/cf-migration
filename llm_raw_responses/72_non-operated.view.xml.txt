@@ -1,0 +1,26 @@
+**Action Plan Execution**
+
+**File:** `view\non-operated.view.xml`  
+**Reason:** XML view for non-operated, defines UI layout.  
+**Action:** Copy  
+**Target:** `webapp/view/non-operated.view.xml`  
+
+---
+
+**Result:**  
+The contents of `view\non-operated.view.xml` will be copied to `webapp/view/non-operated.view.xml` as requested.
+
+**Snippet confirmation:**  
+The file starts with:
+```xml
+<mvc:View controllerName="sierra.pra.PRA_Custom.controller.non-operated" height="100%"
+```
+and contains the full SAPUI5 XML view definition for the Non-Operated Payout Setup and Inquiry UI.
+
+---
+
+**Next Steps:**  
+- No further action required unless you want to modify, refactor, or add additional files/views/controllers.
+
+**Summary:**  
+✅ `view\non-operated.view.xml` → `webapp/view/non-operated.view.xml` (copied as-is)

@@ -1,0 +1,332 @@
+**Action Plan Execution**
+
+**File:** `view\owner_details.view.xml`  
+**Reason:** XML view for owner_details, defines UI layout.  
+**Action:** Copy  
+**Target:** `webapp/view/owner_details.view.xml`  
+
+---
+
+**Result:**  
+The contents of `view\owner_details.view.xml` will be copied to `webapp/view/owner_details.view.xml` as requested.
+
+**File to be created:**  
+`webapp/view/owner_details.view.xml`
+
+**Content:**
+```xml
+<mvc:View controllerName="sierra.pra.PRA_Custom.controller.payout_position" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.uxap" xmlns:m="sap.m"
+	xmlns:core="sap.ui.core" xmlns:forms="sap.ui.layout.form" height="100%">
+	<ObjectPageLayout id="ObjectPageLayout" upperCaseAnchorBar="false">
+		<headerTitle>
+			<ObjectPageDynamicHeaderTitle>
+				<expandedHeading>
+					<m:Title text="Revenue Ownership Owner Details Maintenance"/>
+				</expandedHeading>
+				<snappedHeading>
+					<m:HBox>
+						<m:Avatar src="./test-resources/sap/uxap/images/robot.png" class="sapUiMediumMarginEnd" displayShape="Square"/>
+						<m:VBox>
+							<m:Title text="Revenue Ownership Owner Details Maintenance"/>
+							<!--<m:Label text="PO-48865" />-->
+						</m:VBox>
+					</m:HBox>
+				</snappedHeading>
+				<expandedContent>
+					<!--<m:Label text="PO-48865"/>-->
+				</expandedContent>
+				<snappedTitleOnMobile>
+					<m:Title text="Revenue Ownership Owner Details Maintenance"/>
+				</snappedTitleOnMobile>
+				<!--<actions>-->
+				<!--	<m:Button text="Edit" type="Emphasized" />-->
+				<!--	<m:Button text="Delete" />-->
+				<!--	<m:Button text="Simulate Assembly" />-->
+				<!--</actions>-->
+			</ObjectPageDynamicHeaderTitle>
+		</headerTitle>
+		<headerContent>
+		
+			<m:FlexBox wrap="Wrap" fitContainer="true">
+				<m:Avatar src="./test-resources/sap/uxap/images/robot.png" class="sapUiMediumMarginEnd sapUiSmallMarginBottom" displayShape="Square"
+					displaySize="L"/>
+				<m:VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom">
+					<m:HBox class="sapUiTinyMarginBottom" renderType="Bare">
+						<m:Label text="Venture:" class="sapUiTinyMarginEnd"/>
+						<m:Text text=" 217079"/>
+					</m:HBox>
+					<m:HBox class="sapUiTinyMarginBottom" renderType="Bare">
+						<m:Label text="Deck Code:" class="sapUiTinyMarginEnd"/>
+						<m:Text text=" 2"/>
+					</m:HBox>
+					<m:HBox>
+						<m:Label text="Company:" class="sapUiTinyMarginEnd"/>
+						<m:Link text=" Sierra_Digital"/>
+					</m:HBox>
+					<m:HBox>
+						<m:Label text="Deck Type:" class="sapUiTinyMarginEnd"/>
+						<m:Link text=" Rev"/>
+					</m:HBox>
+					<!--<m:HBox>-->
+					<!--	<m:Label text="Well Name:" class="sapUiTinyMarginEnd"/>-->
+					<!--	<m:Link text=" Johnson Heirs #1"/>-->
+					<!--</m:HBox>-->
+				</m:VBox>
+				<!--<m:VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom">-->
+				<!--	<m:Title text="Status" class="sapUiTinyMarginBottom" />-->
+				<!--	<m:ObjectStatus text="Delivery"-->
+				<!--		state="Success"-->
+				<!--		class="sapMObjectStatusLarge" />-->
+				<!--</m:VBox>-->
+				<m:VBox class="sapUiLargeMarginEnd">
+					<m:Title text="Product" class="sapUiTinyMarginBottom"/>
+					<m:ObjectStatus text="Oil" icon="sap-icon://factory" class="sapMObjectStatusLarge"/>
+				</m:VBox>
+				<m:VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom">
+					<m:Title text="Effective Date" class="sapUiTinyMarginBottom"/>
+					<m:ObjectStatus text="2020-01-01" icon="sap-icon://calendar" class="sapMObjectStatusLarge"/>
+				</m:VBox>
+				
+				<m:VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom">
+					<m:Title text="End Date" class="sapUiTinyMarginBottom"/>
+					<m:ObjectStatus text="9999-12-01" icon="sap-icon://calendar" class="sapMObjectStatusLarge"/>
+				</m:VBox>
+				
+			</m:FlexBox>
+		</headerContent>
+		<sections>
+			<ObjectPageSection titleUppercase="false" title="Expense/Revenue">
+				<subSections>
+					<ObjectPageSubSection title="Expense" showTitle="false">
+						<blocks>
+							<m:Table class="sapUxAPObjectPageSubSectionAlignContent" width="auto">
+								<m:headerToolbar>
+									<m:OverflowToolbar>
+										<m:Title text="Expense" level="H2"/>
+										<m:ToolbarSpacer/>
+										<m:SearchField width="17.5rem"/>
+										<m:OverflowToolbarButton tooltip="Sort" text="Sort" icon="sap-icon://sort"/>
+										<m:OverflowToolbarButton tooltip="Filter" text="Filter" icon="sap-icon://filter"/>
+										<m:OverflowToolbarButton tooltip="Group" text="Group" icon="sap-icon://group-2"/>
+										<m:OverflowToolbarButton tooltip="Settings" text="Settings" icon="sap-icon://action-settings"/>
+									</m:OverflowToolbar>
+								</m:headerToolbar>
+								<m:columns>
+									<m:Column>
+										<m:Text text="Acct Date"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="Prod Date"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="Account"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="Account Description"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="Exp Amt"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="Penality %"/>
+									</m:Column>
+									<m:Column hAlign="End">
+										<m:Text text="Total Exp Amt"/>
+									</m:Column>
+								</m:columns>
+								<m:items>
+									<m:ColumnListItem>
+										<m:Link text="1-Feb"/>
+										<m:Text text="1-Jan"/>
+										<m:Text text="6500.01"/>
+										<m:Text text="MISCELLANEOUS COSTS"/>
+										<m:Text text="1000"/>
+										<m:Text text="0.00"/>
+										<m:Text text="1000.00"/>
+									</m:ColumnListItem>
+									<m:ColumnListItem>
+										<m:Link text="1-Feb"/>
+										<m:Text text="1-Jan"/>
+										<m:Text text="6500.03"/>
+										<m:Text text="ADMIN COSTS"/>
+										<m:Text text="1000"/>
+										<m:Text text="0.00"/>
+										<m:Text text="1000.00"/>
+									</m:ColumnListItem>
+									<m:ColumnListItem>
+										<m:Link text="1-Feb"/>
+										<m:Text text="1-Jan"/>
+										<m:Text text="7320.02"/>
+										<m:Text text="LABOR - COMPANY"/>
+										<m:Text text="627.66"/>
+										<m:Text text="110.00"/>
+										<m:Text text="690.43"/>
+									</m:ColumnListItem>
+									<m:ColumnListItem>
+										<m:Link text="1-Feb"/>
+										<m:Text text="1-Jan"/>
+										<m:Text text="7320.02"/>
+										<m:Text text="LABOR - COMPANY"/>
+										<m:Text text="648.58"/>
+										<m:Text text="110.00"/>
+										<m:Text text="713.44"/>
+									</m:ColumnListItem>
+									<m:ColumnListItem>
+										<m:Link text="1-Feb"/>
+										<m:Text text="1-Jan"/>
+										<m:Text text="7320.42"/>
+										<m:Text text="LABOR - COMPANY"/>
+										<m:Text text="827.53"/>
+										<m:Text text="115.00"/>
+										<m:Text text="951.66"/>
+									</m:ColumnListItem>
+								</m:items>
+							</m:Table>
+						</blocks>
+					</ObjectPageSubSection>
+					<ObjectPageSubSection title="Revenue" showTitle="false">
+						<blocks>
+							<m:Table class="sapUxAPObjectPageSubSectionAlignContent" width="auto">
+								<m:headerToolbar>
+									<m:OverflowToolbar>
+										<m:Title text="Revenue" level="H2"/>
+										<m:ToolbarSpacer/>
+										<m:SearchField width="17.5rem"/>
+										<m:OverflowToolbarButton tooltip="Sort" text="Sort" icon="sap-icon://sort"/>
+										<m:OverflowToolbarButton tooltip="Filter" text="Filter" icon="sap-icon://filter"/>
+										<m:OverflowToolbarButton tooltip="Group" text="Group" icon="sap-icon://group-2"/>
+										<m:OverflowToolbarButton tooltip="Settings" text="Settings" icon="sap-icon://action-settings"/>
+									</m:OverflowToolbar>
+								</m:headerToolbar>
+								<m:columns>
+									<m:Column>
+										<m:Text text="Acct Date"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="Svc Date"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="Product"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="UOM"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="Interest"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="REC Interest"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="Volume"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="Value"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="Taxes"/>
+									</m:Column>
+									<m:Column minScreenWidth="Tablet" demandPopin="true">
+										<m:Text text="Deducts"/>
+									</m:Column>
+									<m:Column hAlign="End">
+										<m:Text text="Revenue Net"/>
+									</m:Column>
+								</m:columns>
+								<m:items>
+									<m:ColumnListItem>
+										<m:Link text="2020-05-01"/>
+										<m:Text text="2020-03-01"/>
+										<m:Text text="GAS"/>
+										<m:Text text="MCF"/>
+										<m:Text text="0.203125"/>
+										<m:Text text="0.203125807"/>
+										<m:Text text="2920"/>
+										<m:Text text="10231.00"/>
+										<m:Text text="-736.60"/>
+										<m:Text text="-69.60"/>
+										<m:Text text="9424.80"/>
+									</m:ColumnListItem>
+									<m:ColumnListItem>
+										<m:Link text="2020-06-01"/>
+										<m:Text text="2020-04-01"/>
+										<m:Text text="GAS"/>
+										<m:Text text="MCF"/>
+										<m:Text text="0.203125"/>
+										<m:Text text="0.203125811"/>
+										<m:Text text="2440"/>
+										<m:Text text="9388.80"/>
+										<m:Text text="-676.60"/>
+										<m:Text text="-63.80"/>
+										<m:Text text="8649.00"/>
+									</m:ColumnListItem>
+									<m:ColumnListItem>
+										<m:Link text="2020-07-01"/>
+										<m:Text text="2020-05-01"/>
+										<m:Text text="GAS"/>
+										<m:Text text="MCF"/>
+										<m:Text text="0.203125"/>
+										<m:Text text="0.203126099"/>
+										<m:Text text="3680"/>
+										<m:Text text="16179.40"/>
+										<m:Text text="-1164.60"/>
+										<m:Text text="-110.00"/>
+										<m:Text text="14904.80"/>
+									</m:ColumnListItem>
+									<m:ColumnListItem>
+										<m:Link text="2020-08-01"/>
+										<m:Text text="2020-06-01"/>
+										<m:Text text="GAS"/>
+										<m:Text text="MCF"/>
+										<m:Text text="0.203125"/>
+										<m:Text text="0.203124543"/>
+										<m:Text text="4140"/>
+										<m:Text text="20839.40"/>
+										<m:Text text="-1500.00"/>
+										<m:Text text="-141.80"/>
+										<m:Text text="19197.60"/>
+									</m:ColumnListItem>
+									<m:ColumnListItem>
+										<m:Link text="2020-09-01"/>
+										<m:Text text="2020-07-01"/>
+										<m:Text text="GAS"/>
+										<m:Text text="MCF"/>
+										<m:Text text="0.203125"/>
+										<m:Text text="0.203129262"/>
+										<m:Text text="980"/>
+										<m:Text text="4616.60"/>
+										<m:Text text="-332.40"/>
+										<m:Text text="-31.40"/>
+										<m:Text text="4252.80"/>
+									</m:ColumnListItem>
+								</m:items>
+							</m:Table>
+						</blocks>
+					</ObjectPageSubSection>
+				</subSections>
+			</ObjectPageSection>
+			<ObjectPageSection titleUppercase="false" title="Payout Position">
+				<subSections>
+					<ObjectPageSubSection title="Payout Position">
+						<blocks>
+							<forms:SimpleForm class="sapUxAPObjectPageSubSectionAlignContent" layout="ColumnLayout" columnsM="1" columnsL="1" columnsXL="1">
+								<m:Label text="Total Revenue"/>
+								<m:Text text="128770.80"/>
+								<m:Label text="Total Expense"/>
+								<m:Text text="186317.32"/>
+								<m:Label text="Bal Adj Total"/>
+								<m:Text text="3225.59"/>
+								<m:Label text="Payout Position"/>
+								<m:Text text="-60772.11"/>
+							</forms:SimpleForm>
+						</blocks>
+					</ObjectPageSubSection>
+				</subSections>
+			</ObjectPageSection>
+		</sections>
+	</ObjectPageLayout>
+</mvc:View>
+```
+
+**Next Step:**  
+You can now use `webapp/view/owner_details.view.xml` in your SAPUI5 application. If you need further modifications or controller logic, let me know!

@@ -1,0 +1,117 @@
+<core:FragmentDefinition class="sapUiSizeCompact" xmlns="sap.m" xmlns:table="sap.ui.table" xmlns:core="sap.ui.core" xmlns:u="sap.ui.unified"
+	xmlns:f="sap.ui.layout.form" xmlns:layout="sap.ui.layout" >
+	<Dialog id="collective_doi_market_free" title="Tax and Deducts" >
+		<beginButton>
+			<Button text="Save" press=".onCloseMarketFreePopover"/>
+		</beginButton>
+		<endButton>
+			<Button text="Cancel" press=".onCloseMarketFreePopover"/>
+		</endButton>
+		
+			
+			<Table id="idTableARPABudgetItems" >
+				
+				<columns>
+					
+					<Column >
+						
+						<Text text="Tax / Deducts Code"/>
+					</Column>
+					<Column >
+					<Text text="Exempt"/>
+					</Column>
+					<Column >
+						
+						<Text text="Free"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text width="25em" text="Severance"/>
+							<CheckBox selected="true"/>
+						    <CheckBox />
+						</cells>
+					</ColumnListItem>
+					<ColumnListItem>
+						<cells>
+							<Text width="25em" text="Ad Valorem"/>
+							<CheckBox selected="true"/>
+						    <CheckBox />
+						</cells>
+					</ColumnListItem>
+					<ColumnListItem>
+						<cells>
+								<Text width="25em" text="With Holding"/>
+							<CheckBox selected="true"/>
+						    <CheckBox />
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+								<Text width="25em" text="Production"/>
+							<CheckBox selected="true"/>
+						    <CheckBox />
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+								<Text width="25em" text="Conservation"/>
+							<CheckBox selected="true"/>
+						    <CheckBox />
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+								<Text width="25em" text="Transportation"/>
+							<CheckBox selected="true"/>
+						    <CheckBox />
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+								<Text width="25em" text="Gathering"/>
+							<CheckBox selected="true"/>
+						    <CheckBox />
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+								<Text width="25em" text="Marketing"/>
+							<CheckBox selected="true"/>
+						    <CheckBox />
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+								<Text width="25em" text="Fuel"/>
+							<CheckBox selected="true"/>
+						    <CheckBox />
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+								<Text width="25em" text="Treating"/>
+							<CheckBox selected="true"/>
+						    <CheckBox />
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+								<Text width="25em" text="Inventory"/>
+							<CheckBox selected="true"/>
+						    <CheckBox />
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+								<Text width="25em" text="Other"/>
+							<CheckBox selected="true"/>
+						    <CheckBox />
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		
+	</Dialog>
+</core:FragmentDefinition>

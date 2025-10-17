@@ -1,0 +1,182 @@
+**Action: Copy**
+
+**Target:** `webapp/view/collective_doi_bearer_group.fragment.xml`
+
+**Reason:** Fragment for collective_doi bearer group dialog.
+
+**Snippet:**
+```xml
+<core:FragmentDefinition class="sapUiSizeCompact" xmlns="sap.m" xmlns:table="sap.ui.table" xmlns:core="sap.ui.core" xmlns:u="sap.ui.unified"
+	xmlns:f="sap.ui.layout.form" xmlns:layout="sap.ui.layout" xmlns:fb="sap.ui.comp.filterbar" >
+	<Dialog id="collective_doi_bearer_group" title="Revenue Owner Burdens" >
+		
+		<endButton>
+			<Button text="Close" press=".onCloseBearerPopover"/>
+		</endButton>
+		
+			<fb:FilterBar id="filterbar"  >
+					<fb:filterItems>
+						<fb:FilterItem name="z" label="Burden Owner">
+							<fb:control>
+								<Input id="productInput1" placeholder="" showSuggestion="true" showValueHelp="true" editable="false">
+								</Input>
+							</fb:control>
+						</fb:FilterItem>
+						<fb:FilterItem name="issueDate" label=" Start Date">
+							<fb:control>
+								<DateRangeSelection id="idIssueDate" displayFormat="MM/dd/yyyy" change="onChangeIssueDate"/>
+							</fb:control>
+						</fb:FilterItem>
+						<fb:FilterItem name="A" label="Burden %">
+							<fb:control>
+									<Input id="productInput3" placeholder="" showSuggestion="true" showValueHelp="true" editable="false">
+								</Input>
+							</fb:control>
+						</fb:FilterItem>
+
+					</fb:filterItems>
+					<fb:filterItems>
+					<fb:FilterItem name="z1" label="Burdened By Owner">
+							<fb:control>
+								<Input id="productIn" placeholder="" showSuggestion="true" showValueHelp="true" editable="false">
+								</Input>
+							</fb:control>
+						</fb:FilterItem>
+						<fb:FilterItem name="issueDate1" label="End Date">
+							<fb:control>
+								<DateRangeSelection id="idIssue" displayFormat="MM/dd/yyyy" change="onChangeIssueDate"/>
+							</fb:control>
+						</fb:FilterItem>
+						<fb:FilterItem name="A1" label="Burden Decimal">
+							<fb:control>
+									<Input id="productI3" placeholder="" showSuggestion="true" showValueHelp="true" editable="false">
+								</Input>
+							</fb:control>
+						</fb:FilterItem>
+
+					</fb:filterItems>
+				</fb:FilterBar>	
+				
+				
+			
+			
+			<IconTabBar id="iconTab" class="sapUiResponsiveContentPadding">
+		<items>
+			<IconTabFilter
+			>
+                    <OverflowToolbar>
+            <ToolbarSpacer/>
+            
+			<Button id="burden"  text="Burden" tooltip="" type="Accept" press="onMarketFreePopup"/>
+			
+			
+            </OverflowToolbar>
+			
+			
+				
+				
+				<Table
+					id="idProductsTable"
+					inset="false"
+                    
+                    selectionChange="SelectionChge"
+                    growing="true"
+				    growingThreshold="10"
+				   
+				    >
+				<columns>
+					<Column
+							minScreenWidth="Tablet"
+							demandPopin="true"
+							hAlign="Center"
+							>
+						<Text text="By Owner ID"/>
+					</Column>
+					<Column
+							minScreenWidth="Tablet"
+							demandPopin="true"
+							hAlign="Center"
+							>
+						<Text text="Owner Name"/>
+					</Column>
+					<Column
+							minScreenWidth="Tablet"
+							demandPopin="true"
+							hAlign="Center"
+							>
+						<Text text="Interest Type"/>
+					</Column>
+					 <!--newly added-->
+							<Column
+								minScreenWidth="Tablet"
+								demandPopin="true"
+								hAlign="Center">
+						<Text text="Start date"/>
+					</Column>
+					
+							<Column
+								minScreenWidth="Tablet"
+								demandPopin="true"
+								hAlign="Center">
+						<Text text="End Date"/>
+					</Column>
+					
+							<Column
+								minScreenWidth="Tablet"
+								demandPopin="true"
+								hAlign="Center">
+						<Text text="Burden %"/>
+					</Column>
+					
+							<Column
+								minScreenWidth="Tablet"
+								demandPopin="true"
+								hAlign="Center"
+								>
+						<Text text="Burden Decimal"/>
+					</Column>
+					
+					
+				</columns>
+
+				<items>
+					<ColumnListItem
+					type="Active"
+					press="onSelectionChge"
+							vAlign="Middle">
+						<cells>
+							<!--<ObjectIdentifier-->
+							<!--		title="{WellId}"-->
+							<!--	/>-->
+							<Text text="{oModel>Vname}"/>
+							
+							<Text text="{oModel>VnameNm}"/>
+							<Text text="{oModel>OiuTimestamp}"/>
+							<Text text="{oModel>Bukrs}"/>
+							<Text text="{oModel>VnameIntCd}"/>
+							<Text text="{oModel>Shtxt}"/>
+							<Text text="{oModel>StsCode}"/>
+							<Text text="{oModel>StsEffDt}"/>
+							<Text text="{oModel>StsEffDt}"/>
+							<Text text="{oModel>Country}"/>
+							<Text text="{oModel>OnsOfsCd}"/>
+							<Text text="{oModel>LpnNo}"/>
+							
+							
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+			</IconTabFilter>
+		</items>
+	</IconTabBar>
+		
+	
+	</Dialog>
+</core:FragmentDefinition>
+```
+
+**Instructions:**  
+- Save the above content as `webapp/view/collective_doi_bearer_group.fragment.xml`.  
+- This fragment defines the dialog UI for the "Revenue Owner Burdens" feature, including filter bars and a table.  
+- No code changes required, just copy the content.

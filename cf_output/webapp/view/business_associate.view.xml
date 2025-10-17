@@ -1,0 +1,493 @@
+<mvc:View
+		controllerName="sierra.pra.PRA_Custom.controller.business_associate"
+		height="100%"
+		xmlns:mvc="sap.ui.core.mvc"
+		xmlns:core="sap.ui.core"
+		xmlns:layout="sap.ui.layout"
+		xmlns="sap.m"
+		xmlns:f="sap.f"
+		xmlns:fb="sap.ui.comp.filterbar"
+		xmlns:vm="sap.ui.comp.variants"
+		xmlns:forms="sap.ui.layout.form">
+		<f:DynamicPage id="dynamicPageId" headerExpanded="{/headerExpanded}">
+			<!-- DynamicPage Title -->
+			<f:title>
+				<f:DynamicPageTitle>
+					<f:heading>
+						<vm:VariantManagement standardItemText="Business Partner">
+						</vm:VariantManagement>
+					</f:heading>
+					<f:actions>
+						<ToolbarSpacer/>
+						<Button
+								text="FILTER"
+								icon="sap-icon://filter"
+								type="Transparent"
+								press="onPressBAFilter"
+								/>
+						<Button
+								text="ADD"
+								icon="sap-icon://create-form"
+								type="Transparent"/>
+						<Button
+								text="EDIT"
+								icon="sap-icon://write-new-document"
+								type="Transparent"
+								press="onToggleFooter"/>
+						<Button
+								text="DELETE"
+								icon="sap-icon://delete"
+								type="Transparent"/>
+						<Button
+								text="CANCEL"
+								icon="sap-icon://reset"
+								type="Transparent"/>
+		
+					</f:actions>
+				</f:DynamicPageTitle>
+			</f:title>
+			<!-- DynamicPage Header -->
+			<f:header>
+				<f:DynamicPageHeader pinnable="true">
+					<f:content>
+						<fb:FilterBar id="filterbar" reset="onReset" search="onSearch" useToolbar="true" showGoOnFB="false">
+							<fb:filterItems>
+								<fb:FilterItem name="A" label="BA Number">
+									<fb:control>
+										<Select
+										id="slBaNumber"
+										forceSelection="true"
+										change="onSelectChange"
+										items="{
+                                                    path: '/SE_BANUMBERSet'
+                                                }">
+										<core:Item key="{BANUMBER}" text="{BANUMBER}"/>
+										</Select>
+									</fb:control>				
+								</fb:FilterItem>								
+								<fb:FilterItem name="B" label="Owner Name">
+									<fb:control>
+										<Select
+										id="Name1"
+										change="onSelectChange"
+										forceSelection="true"
+										items="{
+                                                    path: '/SE_OWNER_NAMESet'
+                                                 }">
+										<core:Item key="{OWNER_NAME}" text="{OWNER_NAME}"/>
+										</Select>
+									</fb:control>				
+								</fb:FilterItem>
+								
+								
+							</fb:filterItems>
+						</fb:FilterBar>
+					</f:content>
+				</f:DynamicPageHeader>
+			</f:header>
+
+			<!-- DynamicPage Content -->
+			<f:content>
+				
+		<IconTabBar id="iconTabBar6" class="sapUiResponsiveContentPadding">
+			<items>
+				<IconTabFilter
+					icon="sap-icon://hint"
+					iconColor="Positive"
+					design="Horizontal"
+					text="Business Partner"
+					key="Ok" >
+					 <!--address details-->
+					
+							<forms:SimpleForm class="sapUxAPObjectPageSubSectionAlignContent"
+								layout="ColumnLayout"
+								columnsM="2"
+								columnsL="3"
+								columnsXL="4">
+								<core:Title text="Details" />
+
+								<Label text="BA Number" />
+								<Text text="{oModel>/businessPartnerData/0/BaNumber}" />
+
+								<Label text="Name 1" />
+								<Link text="{oModel>/businessPartnerData/0/Name1}" />
+								<Label text="Name 2" />
+								<Text text="{oModel>/businessPartnerData/0/Name2}" />
+								<Label text="Name 3" />
+								<Text text="" />
+
+								<!--<Label text="Factory" />-->
+								<!--<Text text="Orlando, FL" />-->
+
+								<!--<Label text="Supplier" />-->
+								<!--<Text text="Robotech" />-->
+
+								<core:Title text="Address" />
+
+								<Label text="Address 1" />
+								<Text text="{oModel>/businessPartnerData/0/Address1}" />
+
+								<Label text="Address 2" />
+								<Text text="{oModel>/businessPartnerData/0/Address2}" />
+
+								<Label text="City" />
+								<Text text="{oModel>/businessPartnerData/0/City}" />
+
+								<Label text="State" />
+								<Text text="{oModel>/businessPartnerData/0/State}" />
+
+								<Label text="Postal Code"/>
+								<Text text="{oModel>/businessPartnerData/0/Zip}" />
+								<Label text="Country"/>
+								<Text text="{oModel>/businessPartnerData/0/Country}" />
+								
+							</forms:SimpleForm>
+						
+					 <!--Address details end-->
+					
+				</IconTabFilter>
+				
+				<IconTabFilter
+					icon="sap-icon://account"
+					iconColor="Critical"
+					design="Horizontal"
+					
+					text="Business Partner Details"
+					key="Heavy">
+					 <!--table in 1st tab-->
+					 <forms:SimpleForm class="sapUxAPObjectPageSubSectionAlignContent"
+								layout="ColumnLayout"
+								columnsM="2"
+								columnsL="3"
+								columnsXL="4">
+								<core:Title text="Business Associate Header" />
+
+								<Label text="BA Number" />
+								<Text text="{oModel>/businessPartnerData/0/BaNumber}" />
+
+								<Label text="Name 1" />
+								<Text text="{oModel>/businessPartnerData/0/Name1}" />
+								<Label text="Name 2" />
+								<Text text="{oModel>/businessPartnerData/0/Name2}" />
+								<Label text="Address 1" />
+								<Text text="{oModel>/businessPartnerData/0/Address1}" />
+
+								<Label text="Address 2" />
+								<Text text="{oModel>/businessPartnerData/0/Address2}" />
+
+								<!--<Label text="Supplier" />-->
+								<!--<Text text="Robotech" />-->
+
+							
+								
+							</forms:SimpleForm>
+							<HBox justifyContent="End" id="Tabelle">
+								<Button
+								text="ADD"
+								icon="sap-icon://create-form"
+								type="Transparent"/>
+						<Button
+								text="EDIT"
+								icon="sap-icon://write-new-document"
+								type="Transparent"
+								press="onToggleFooter"/>
+						<Button
+								text="DELETE"
+								icon="sap-icon://delete"
+								type="Transparent"/>
+						<Button
+								text="CANCEL"
+								icon="sap-icon://reset"
+								type="Transparent"/>
+								</HBox>
+					  <forms:SimpleForm>
+					 <core:Title text="BA Detail" />
+					
+					 	<Table
+						id="idProductsTable"
+						inset="false"
+						items="{
+                            path: 'oModel>/businessPartnerData/'
+                        }">
+
+					<columns>
+						<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="Usage Code"/>
+						</Column>
+						<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="TIN / SS#"/>
+						</Column>
+						<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="Entity Type"/>
+						</Column>
+						 <!--newly added-->
+							<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="Tax Type"/>
+						</Column>
+						
+						
+						 <!--newly added-->
+					</columns>
+
+					<items>
+						<ColumnListItem
+								vAlign="Middle">
+							<cells>
+								<ObjectIdentifier
+										text="{oModel>UsageCode}"/>
+								<Text text="{oModel>TinOrSs}"/> 
+								<Text text="{oModel>EntityType}"/> 
+								<Text text="{oModel>TaxType}"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+					</forms:SimpleForm>
+					  <!--Table end-->
+				</IconTabFilter>
+				
+				<IconTabFilter
+					icon="sap-icon://monitor-payments"
+					iconColor="Positive"
+					design="Horizontal"
+					
+					text="Banking Information"
+					key="Overweight">
+					<!--3rd tab-->
+					 <!--table in 1st tab-->
+					 <forms:SimpleForm class="sapUxAPObjectPageSubSectionAlignContent"
+								layout="ColumnLayout"
+								columnsM="2"
+								columnsL="3"
+								columnsXL="4">
+								<core:Title text="Business Associate Header" />
+
+								<Label text="BA Number" />
+								<Text text="{oModel>/businessPartnerData/0/BaNumber}" />
+
+								<Label text="Name 1" />
+								<Text text="{oModel>/businessPartnerData/0/Name1}" />
+								<Label text="Name 2" />
+								<Text text="{oModel>/businessPartnerData/0/Name2}" />
+								<Label text="Address 1" />
+								<Text text="{oModel>/businessPartnerData/0/Address1}" />
+
+								<Label text="Address 2" />
+								<Text text="{oModel>/businessPartnerData/0/Address2}" />
+
+								<!--<Label text="Supplier" />-->
+								<!--<Text text="Robotech" />-->
+
+							
+								
+							</forms:SimpleForm>
+							<HBox justifyContent="End" id="Table3">
+								<Button
+								text="ADD"
+								icon="sap-icon://create-form"
+								type="Transparent"/>
+						<Button
+								text="EDIT"
+								icon="sap-icon://write-new-document"
+								type="Transparent"
+								press="onToggleFooter"/>
+						<Button
+								text="DELETE"
+								icon="sap-icon://delete"
+								type="Transparent"/>
+						<Button
+								text="CANCEL"
+								icon="sap-icon://reset"
+								type="Transparent"/>
+								</HBox>
+					  <forms:SimpleForm>
+					 <core:Title text="Banking Information" />
+					
+					 	<Table
+						id="idProductsTable3"
+						inset="false"
+						>
+
+					<columns>
+						<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="Bank ID"/>
+						</Column>
+						<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="Bank Name"/>
+						</Column>
+						<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="Routing Number"/>
+						</Column>
+						 <!--newly added-->
+							<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="Account Number"/>
+						</Column>
+						
+						<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="Account Type"/>
+						</Column>
+						
+						
+						 <!--newly added-->
+					</columns>
+
+					<items>
+						<ColumnListItem
+								vAlign="Middle">
+							<cells>
+								<ObjectIdentifier
+									
+										text="01"/>
+								<Text text="Bank of Texas"/>
+								<Text text="XXXX-XXXX-4321"/>
+								<Text text="XXXX-XXXX-7891"/>
+								<Text text="Checking"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+					</forms:SimpleForm>
+					  <!--Table end-->
+					 <!--3rd tab-->
+					 </IconTabFilter>
+					 
+				<IconTabFilter
+					icon="sap-icon://batch-payments"
+					iconColor="Negative"
+					design="Horizontal"
+					
+					text="Minimum Pay"
+					key="Overweight1" >
+						<!--4rd tab-->
+					 <!--table in 1st tab-->
+					 <forms:SimpleForm class="sapUxAPObjectPageSubSectionAlignContent"
+								layout="ColumnLayout"
+								columnsM="2"
+								columnsL="3"
+								columnsXL="4">
+								<core:Title text="Business Associate Header" />
+
+								<Label text="BA Number" />
+								<Text text="{oModel>/businessPartnerData/0/BaNumber}" />
+
+								<Label text="Name 1" />
+								<Text text="{oModel>/businessPartnerData/0/Name1}" />
+								<Label text="Name 2" />
+								<Text text="{oModel>/businessPartnerData/0/Name2}" />
+								<Label text="Address 1" />
+								<Text text="{oModel>/businessPartnerData/0/Address1}" />
+
+								<Label text="Address 2" />
+								<Text text="{oModel>/businessPartnerData/0/Address2}" />
+
+								<!--<Label text="Supplier" />-->
+								<!--<Text text="Robotech" />-->
+
+							
+								
+							</forms:SimpleForm>
+							<HBox justifyContent="End" id="Table4">
+								<Button
+								text="ADD"
+								icon="sap-icon://create-form"
+								type="Transparent"/>
+						<Button
+								text="EDIT"
+								icon="sap-icon://write-new-document"
+								type="Transparent"
+								press="onToggleFooter"/>
+						<Button
+								text="DELETE"
+								icon="sap-icon://delete"
+								type="Transparent"/>
+						<Button
+								text="CANCEL"
+								icon="sap-icon://reset"
+								type="Transparent"/>
+								</HBox>
+					  <forms:SimpleForm>
+					 <core:Title text="Minimum Pay" />
+					
+					 	<Table
+						id="idProductsTable4"
+						inset="false"
+					>
+
+					<columns>
+						<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="Pay Code"/>
+						</Column>
+						<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="Minimum Pay"/>
+						</Column>
+						<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="Effective Date From"/>
+						</Column>
+						 <!--newly added-->
+							<Column
+								minScreenWidth="Tablet"
+								demandPopin="true">
+							<Text text="Effective Date To"/>
+						</Column>
+									 <!--newly added-->
+					</columns>
+
+					<items>
+						<ColumnListItem
+								vAlign="Middle">
+							<cells>
+								<ObjectIdentifier
+										title="Pay"
+										/>
+								<Text text="$25.00"/>
+								<Text text="10/10/2021"/>
+								<Text text="02/25/2022"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+					</forms:SimpleForm>
+					  <!--Table end-->
+					 <!--4rd tab-->
+					
+				</IconTabFilter>
+			</items>
+		</IconTabBar>
+			</f:content>
+			
+			
+
+			<!-- DynamicPage Footer -->
+			<!--<f:footer>-->
+			<!--	<OverflowToolbar>-->
+			<!--		<ToolbarSpacer/>-->
+			<!--		<Button type="Accept" text="Accept"/>-->
+			<!--		<Button type="Reject" text="Reject"/>-->
+			<!--	</OverflowToolbar>-->
+			<!--</f:footer>-->
+		</f:DynamicPage>
+</mvc:View>

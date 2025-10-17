@@ -1,0 +1,52 @@
+Certainly! Here’s how you can **transform your neo-app.json** into an **xs-app.json** for Cloud Foundry (CF), based on your provided content and plan.
+
+### Key Points:
+- **neo-app.json** is for SAP Neo environment; **xs-app.json** is for Cloud Foundry.
+- **Destination routing** in xs-app.json uses `"destination"` type, not `"service"`.
+- **SAPUI5 resources** in CF are usually routed via `"destination": "sapui5"` (if configured).
+- **Duplicate routes** should be removed.
+- **sendWelcomeFileRedirect** is not supported in xs-app.json.
+
+---
+
+## Transformed `xs-app.json` (for Cloud Foundry)
+
+```json
+{
+  "welcomeFile": "/index.html",
+  "routes": [
+    {
+      "source": "^/resources/(.*)$",
+      "target": "/resources/$1",
+      "destination": "sapui5",
+      "authenticationType": "none"
+    },
+    {
+      "source": "^/test-resources/(.*)$",
+      "target": "/test-resources/$1",
+      "destination": "sapui5",
+      "authenticationType": "none"
+    },
+    {
+      "source": "^/sap/opu/odata/(.*)$",
+      "target": "/sap/opu/odata/$1",
+      "destination": "WebIDE_1909",
+      "authenticationType": "none"
+    }
+  ]
+}
+```
+
+---
+
+### Notes:
+- **source/target**: xs-app.json uses regex for source and target paths.
+- **destination**: Name must match your CF destination configuration.
+- **authenticationType**: Set to `"none"` if not required, or `"basic"`/`"oauth2"` as needed.
+- **Duplicate routes**: Removed for clarity.
+- **sendWelcomeFileRedirect**: Not supported in xs-app.json, so omitted.
+
+---
+
+**Place this file in your `cf-root/xs-app.json` as per your plan.**  
+If you need to add more routes or adjust authentication, let me know!

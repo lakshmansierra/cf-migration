@@ -1,0 +1,200 @@
+**Plan Execution: Copy XML View for Payout**
+
+**Action:**  
+Copy the XML view file for payout to the target location.
+
+---
+
+**Source File:**  
+`view\payout.view.xml`
+
+**Target File:**  
+`webapp/view/payout.view.xml`
+
+**Reason:**  
+This file defines the UI layout for the payout screen in SAPUI5, including filter bars, tables, and actions.
+
+---
+
+**File Content:**  
+```xml
+<mvc:View controllerName="sierra.pra.PRA_Custom.controller.payout" height="100%" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core"
+	xmlns:layout="sap.ui.layout" xmlns="sap.m" xmlns:f="sap.f" xmlns:fb="sap.ui.comp.filterbar" xmlns:vm="sap.ui.comp.variants">
+	<f:DynamicPage id="dynamicPageId" headerExpanded="{/headerExpanded}">
+        <!-- DynamicPage Title -->
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <vm:VariantManagement standardItemText="Payout Setup and Inquiry" />
+                </f:heading>
+                <f:actions>
+                    <ToolbarSpacer />
+                    <Button text="ADD" icon="sap-icon://create-form" type="Transparent" press="onPressPayoutAdd" />
+                    <Button text="EDIT" icon="sap-icon://write-new-document" type="Transparent" press="onToggleFooter" />
+                    <Button text="DELETE" icon="sap-icon://delete" type="Transparent" />
+                    <Button text="CANCEL" icon="sap-icon://reset" type="Transparent" />
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
+        <!-- DynamicPage Header -->
+
+        <f:header>
+            <f:DynamicPageHeader pinnable="true">
+                <f:content>
+                    <fb:FilterBar showGoOnFB="false" showFilterConfiguration="false">
+                        <fb:filterItems>
+                            <fb:FilterItem name="z" label="Payout ID">
+                                <fb:control>
+                                    <Select id="payoutID" forceSelection="false" items="{ path: 'oModelPayoutid>/ids' }">
+                                        <core:Item text="{oModelPayoutid>PAYOUT_ID_List}" key="{oModelPayoutid>PAYOUT_ID_List}" />
+                                    </Select>
+                                </fb:control>
+                            </fb:FilterItem>
+                        </fb:filterItems>
+                    </fb:FilterBar>
+                    <fb:FilterBar id="filterbar" reset="onReset" search="onSearch" useToolbar="true" showGoOnFB="true">
+                        <fb:filterItems>
+                            <!-- Various filter items, some commented out for future use -->
+                            <fb:FilterItem name="F" label="Venture">
+                                <fb:control>
+                                    <SearchField id="searchField" change="onVentureSelect" enableSuggestions="true" search=".onSearch" suggest=".onSuggest" placeholder=""  suggestionItems="{
+					path: 'oModelPayoutVenture>/data',
+					sorter: { path: 'VENTURE_ID' }
+				}">
+                                        <SuggestionItem text="{oModelPayoutVenture>VENTURE_ID}"  />
+                                    </SearchField>
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="D">
+                                <fb:control>
+                                    <Button text="Cost Center" press="onpressCostcenter" />
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="C" label="Status">
+                                <fb:control>
+                                    <Select id="slDOIType" forceSelection="true">
+                                        <core:Item key="Active" text="Active" />
+                                        <core:Item key="Inactive" text="Inactive" />
+                                    </Select>
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="E" label="Payout Type">
+                                <fb:control>
+                                    <Select id="slWell" change="onSelectChange" forceSelection="true">
+                                        <core:Item key="Non-Consent" text="Non-Consent" />
+                                    </Select>
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="H" label="Reporting Frequency">
+                                <fb:control>
+                                    <Select id="slProduct2" forceSelection="true">
+                                        <core:Item key="Monthly" text="Monthly" />
+                                        <core:Item key="Quarterly" text="Quarterly" />
+                                        <core:Item key="Annual" text="Annual" />
+                                        <core:Item key="No Report" text="No Report" />
+                                    </Select>
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="I" label="Begin Date">
+                                <fb:control>
+                                    <DatePicker id="idIssueDate1" displayFormat="MM/dd/yyyy" change="onChangeIssueDate" />
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="issueDate" label="End Date">
+                                <fb:control>
+                                    <DatePicker id="idIssueDate2" displayFormat="MM/dd/yyyy" change="onChangeIssueDate" />
+                                </fb:control>
+                            </fb:FilterItem>
+                            <fb:FilterItem name="J" label="Owner ID">
+                                <fb:control>
+                                    <Select id="slVen" forceSelection="true">
+                                        <!-- Owner IDs can be dynamically added here -->
+                                    </Select>
+                                </fb:control>
+                            </fb:FilterItem>
+                        </fb:filterItems>
+                    </fb:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+        <!-- DynamicPage Content -->
+        <f:content>
+            <Table id="idProductsTablePayout" inset="false" items="{ path: 'oModelPayout>/data' }">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <content>
+                            <Title text="Payout Details" level="H2" />
+                            <ToolbarSpacer />
+                            <Label text="Sticky options:" />
+                            <CheckBox text="ColumnHeaders" select="onSelect" />
+                            <CheckBox text="HeaderToolbar" select="onSelect" />
+                            <CheckBox text="InfoToolbar" select="onSelect" />
+                            <ToggleButton id="ARPAtoggleInfoToolbar" text="Hide/Show InfoToolbar" press="onToggleInfoToolbar" />
+                            <Button id="ARPAdeleteForm" icon="sap-icon://provision" text="Provisions" tooltip="View Provisions" type="Accept" press="onPayoutProvisions" />
+                            <Button id="ARPAtoolRevision" icon="sap-icon://compare-2" text="Adjustments" tooltip="Balance Adj" type="Accept" press="onPayoutBalAdj" />
+                            <Button id="ARPAviewForm" icon="sap-icon://show" text="View Position" tooltip="View Position Inquiry" type="Accept" press="onDisplayForm" />
+                            <Button id="ARPAtoolCreate" icon="sap-icon://add" tooltip="Create Request" type="Accept" press="onCreateRequest" />
+                            <Button id="ARPAmanageForm" icon="sap-icon://edit" tooltip="Manage Form" type="Accept" press="onManageForm" />
+                            <Button id="ARPAtoolDelete" icon="sap-icon://delete" tooltip="Delete Request" type="Accept" press="onDeleteRequest" />
+                        </content>
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="Payout ID" />
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="Venture" />
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="Cost Center" />
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="Status" />
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="Payout Type" />
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="Reporting Frequency" />
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="Begin Date" />
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Text text="End Date" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem vAlign="Middle">
+                        <cells>
+                            <Text text="{oModelPayout>PAYOUT_ID}" />
+                            <Text text="{oModelPayout>VENTURE}" />
+                            <Text text="{oModelPayout>COST_CENTER}" />
+                            <Text text="{oModelPayout>STATUS}" />
+                            <Text text="{oModelPayout>PAYOUT_TYPE}" />
+                            <Text text="{oModelPayout>REPORTING_FREQUENCY}" />
+                            <Text text="{oModelPayout>BEGIN_DATE}" />
+                            <Text text="{oModelPayout>END_DATE}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+        <!-- DynamicPage Footer -->
+        <f:footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button type="Accept" text="Accept" />
+                <Button type="Reject" text="Reject" />
+            </OverflowToolbar>
+        </f:footer>
+    </f:DynamicPage>
+</mvc:View>
+```
+
+---
+
+**Next Step:**  
+Place this file at `webapp/view/payout.view.xml` in your SAPUI5 project.  
+No further action required unless you need to update controller logic or data models.

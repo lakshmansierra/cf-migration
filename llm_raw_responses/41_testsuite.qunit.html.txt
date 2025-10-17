@@ -1,0 +1,23 @@
+Copying file as per your plan:
+
+**Source:** test\testsuite.qunit.html  
+**Target:** webapp/test/testsuite.qunit.html
+
+**Reason:** HTML runner for QUnit test suite.
+
+**File content:**
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<title>QUnit test suite for Basic Template</title>
+	<script src="../../resources/sap/ui/qunit/qunit-redirect.js"></script>
+	<script src="./testsuite.qunit.js" data-sap-ui-testsuite></script>
+</head>
+<body>
+</body>
+</html>
+```
+
+**Action completed:**  
+The file `test\testsuite.qunit.html` has been copied to `webapp/test/testsuite.qunit.html` with the provided content.

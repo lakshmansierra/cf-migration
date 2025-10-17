@@ -1,0 +1,65 @@
+**Action Plan Execution:**
+
+**File:** `view\main.view.xml`  
+**Reason:** Main XML view for the application, defines shell and navigation.  
+**Action:** Copy to `webapp/view/main.view.xml`  
+**Snippets:** Starts with `<mvc:View class="sapUiSizeCompact" controllerName="sierra.pra.PRA_Custom.controller.main"`
+
+---
+
+**Resulting File: `webapp/view/main.view.xml`**
+
+```xml
+<mvc:View class="sapUiSizeCompact" controllerName="sierra.pra.PRA_Custom.controller.main" xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+	xmlns="sap.m" xmlns:table="sap.ui.table" xmlns:core="sap.ui.core" xmlns:sapf="sap.f" xmlns:f="sap.ui.layout.form" xmlns:l="sap.ui.layout"
+	xmlns:tnt="sap.tnt">
+	<tnt:ToolPage id="toolPage">
+		<tnt:header>
+			<sapf:ShellBar title="Sierra PRA" secondTitle="" showMenuButton="true" homeIcon="./resources/sap/ui/documentation/sdk/images/logo_ui5.png"
+				showCopilot="false" showNotifications="true" menuButtonPressed="onMenuButtonPress" showProductSwitcher="true" notificationsNumber="3">
+				<sapf:profile>
+					<Avatar initials="JD"/>
+				</sapf:profile>
+			</sapf:ShellBar>
+		</tnt:header>
+		<tnt:sideContent>
+			<tnt:SideNavigation id="idSideNavigation" expanded="true" selectedKey="{oModel>/selectedKey}" itemSelect="onItemSelect">
+				<tnt:NavigationList items="{path: 'oModel>/navigation', templateShareable:false}">
+					<tnt:NavigationListItem text="{oModel>title}" icon="{oModel>icon}" enabled="{oModel>enabled}" expanded="{oModel>expanded}"
+						items="{oModel>items}" key="{oModel>key}">
+						<tnt:NavigationListItem text="{oModel>title}" key="{oModel>key}" icon="{oModel>icon}" enabled="{oModel>enabled}"></tnt:NavigationListItem>
+					</tnt:NavigationListItem>
+				</tnt:NavigationList>
+				<tnt:fixedItem>
+					<tnt:NavigationList items="{path: 'oModel>/fixedNavigation', templateShareable:false}">
+						<tnt:NavigationListItem text="{oModel>title}" icon="{oModel>icon}"></tnt:NavigationListItem>
+					</tnt:NavigationList>
+				</tnt:fixedItem>
+			</tnt:SideNavigation>
+		</tnt:sideContent>
+		<tnt:mainContents>
+			<NavContainer id="pageContainer" initialPage="page2">
+				<pages>
+					<ScrollContainer id="root" horizontal="false" vertical="true" height="100%"></ScrollContainer>
+					<ScrollContainer id="DEF" horizontal="false" vertical="true" height="100%">
+						<Text text="This is the first page"/>
+					</ScrollContainer>
+					<ScrollContainer id="rootone" horizontal="false" vertical="true" height="100%">
+						<Text text="This is second page"/>
+					</ScrollContainer>
+					<ScrollContainer id="roottwo" horizontal="false" vertical="true" height="100%">
+						<Text text="This is third page"/>
+					</ScrollContainer>
+					<ScrollContainer id="rootthree" horizontal="false" vertical="true" height="100%">
+						<Text text="This is fourth page"/>
+					</ScrollContainer>
+					<ScrollContainer id="rootfive" horizontal="true" vertical="true" height="100%"></ScrollContainer>
+				</pages>
+			</NavContainer>
+		</tnt:mainContents>
+	</tnt:ToolPage>
+</mvc:View>
+```
+
+**Summary:**  
+The main view XML has been copied to `webapp/view/main.view.xml` as requested. This file defines the main shell, navigation, and page containers for your SAPUI5 application.

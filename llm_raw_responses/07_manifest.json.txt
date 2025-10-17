@@ -1,0 +1,234 @@
+Here is your adapted **manifest.json** for your SAPUI5 application, based on your provided content and plan:
+
+```json
+{
+    "_version": "1.12.0",
+    "sap.app": {
+        "id": "sierra.pra.PRA_Custom",
+        "type": "application",
+        "i18n": "i18n/i18n.properties",
+        "applicationVersion": {
+            "version": "1.0.0"
+        },
+        "title": "{{appTitle}}",
+        "description": "{{appDescription}}",
+        "sourceTemplate": {
+            "id": "servicecatalog.connectivityComponentForManifest",
+            "version": "0.0.0"
+        },
+        "dataSources": {
+            "ZPRA_REVENUE_SRV_01": {
+                "uri": "/sap/opu/odata/sap/ZPRA_REVENUE_SRV_01/",
+                "type": "OData",
+                "settings": {
+                    "localUri": "localService/metadata.xml"
+                }
+            }
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "icons": {
+            "icon": "",
+            "favIcon": "",
+            "phone": "",
+            "phone@2": "",
+            "tablet": "",
+            "tablet@2": ""
+        },
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": true,
+            "phone": true
+        }
+    },
+    "sap.ui5": {
+        "flexEnabled": false,
+        "rootView": {
+            "viewName": "sierra.pra.PRA_Custom.view.main",
+            "type": "XML",
+            "async": true,
+            "id": "main"
+        },
+        "dependencies": {
+            "minUI5Version": "1.65.6",
+            "libs": {
+                "sap.ui.layout": {},
+                "sap.ui.core": {},
+                "sap.m": {}
+            }
+        },
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "sierra.pra.PRA_Custom.i18n.i18n"
+                }
+            },
+            "": {
+                "type": "sap.ui.model.odata.v2.ODataModel",
+                "settings": {
+                    "defaultOperationMode": "Server",
+                    "defaultBindingMode": "OneWay",
+                    "defaultCountMode": "Request"
+                },
+                "dataSource": "ZPRA_REVENUE_SRV_01",
+                "preload": true
+            },
+            "prov": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "model/provision.json"
+            }
+        },
+        "resources": {
+            "css": [
+                {
+                    "uri": "css/style.css"
+                }
+            ]
+        },
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "viewType": "XML",
+                "async": true,
+                "viewPath": "sierra.pra.PRA_Custom.view",
+                "controlAggregation": "pages",
+                "controlId": "pageContainer",
+                "clearControlAggregation": false
+            },
+            "routes": [
+                {
+                    "name": "main",
+                    "pattern": "Routemain",
+                    "target": [
+                        "Targetmain"
+                    ]
+                },
+                {
+                    "name": "revenue_header",
+                    "pattern": "Routeviewone",
+                    "target": [
+                        "target_view1"
+                    ]
+                },
+                {
+                    "name": "business_associate",
+                    "pattern": "Routeviewtwo",
+                    "target": [
+                        "target_view2"
+                    ]
+                },
+                {
+                    "name": "payout",
+                    "pattern": "Routeviewthree",
+                    "target": [
+                        "target_view3"
+                    ]
+                },
+                {
+                    "name": "owner_details",
+                    "pattern": "Routeviewfour",
+                    "target": [
+                        "target_view4"
+                    ]
+                },
+                {
+                    "name": "payout_position",
+                    "pattern": "Routeviewfive",
+                    "target": [
+                        "target_view5"
+                    ]
+                },
+                {
+                    "name": "venture",
+                    "pattern": "ventureRoute",
+                    "target": [
+                        "ventureTarget"
+                    ]
+                },
+                {
+                    "name": "collective_doi",
+                    "pattern": "collectiveDoi",
+                    "target": [
+                        "collective_doi"
+                    ]
+                },
+                {
+                    "name": "jointventure",
+                    "pattern": "jointventureRoute",
+                    "target": [
+                        "jointventureTarget"
+                    ]
+                },
+                {
+                    "name": "non-operated",
+                    "pattern": "non-operated",
+                    "target": [
+                        "non-operated"
+                    ]
+                }
+            ],
+            "targets": {
+                "Targetmain": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "main",
+                    "viewName": "main"
+                },
+                "target_view1": {
+                    "viewType": "XML",
+                    "viewName": "revenue_header"
+                },
+                "target_view2": {
+                    "viewType": "XML",
+                    "viewName": "business_associate"
+                },
+                "target_view3": {
+                    "viewType": "XML",
+                    "viewName": "payout"
+                },
+                "target_view4": {
+                    "viewType": "XML",
+                    "viewName": "owner_details"
+                },
+                "target_view5": {
+                    "viewType": "XML",
+                    "viewName": "payout_position"
+                },
+                "ventureTarget": {
+                    "viewType": "XML",
+                    "viewName": "venture"
+                },
+                "collective_doi": {
+                    "viewType": "XML",
+                    "viewName": "collective_doi"
+                },
+                "jointventureTarget": {
+                    "viewType": "XML",
+                    "viewName": "jointventure"
+                },
+                "non-operated": {
+                    "viewType": "XML",
+                    "viewName": "non-operated"
+                }
+            }
+        }
+    },
+    "sap.platform.hcp": {
+        "uri": "webapp",
+        "_version": "1.1.0"
+    }
+}
+```
+
+**Notes:**
+- This manifest is ready for your UI5 app in `webapp/manifest.json`.
+- It defines your OData service, models, routing, and views.
+- Replace `{{appTitle}}` and `{{appDescription}}` in your i18n files for localization.
+- If you need further adaptation (e.g., new routes, models, or data sources), specify your requirements!

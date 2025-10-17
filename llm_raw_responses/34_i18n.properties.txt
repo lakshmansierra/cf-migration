@@ -1,0 +1,26 @@
+Your plan is to copy the internationalization resource bundle from i18n\i18n.properties to webapp/i18n/i18n.properties for your SAPUI5 application. Here’s how you can do it:
+
+**Step-by-step instructions:**
+
+1. **Create the target directory (if it doesn’t exist):**
+   - Make sure the folder webapp/i18n exists in your project structure.
+
+2. **Copy the file content:**
+   - Create a file named i18n.properties inside webapp/i18n.
+   - Paste the following content into webapp/i18n/i18n.properties:
+
+```properties
+title=Sierra Extension for SAP PRA
+appTitle=Sierra PRA
+appDescription=sap-icon://loan
+```
+
+**Result:**
+- Your SAPUI5 app will now use these texts for internationalization, making them available for binding in your UI5 views and controllers.
+
+**Example usage in XML View:**
+```xml
+<Text text="{i18n>title}" />
+```
+
+Let me know if you need help with integrating these texts into your UI5 app!

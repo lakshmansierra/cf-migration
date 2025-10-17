@@ -1,0 +1,94 @@
+**Action: Copy**
+
+The fragment for the payout provisions dialog will be copied as requested.
+
+**Target:**  
+`webapp/view/payout_provisions.fragment.xml`
+
+**Content:**
+```xml
+<core:FragmentDefinition class="sapUiSizeCompact" xmlns="sap.m" xmlns:table="sap.ui.table" xmlns:core="sap.ui.core" xmlns:u="sap.ui.unified"
+	xmlns:f="sap.ui.layout.form" xmlns:layout="sap.ui.layout" >
+	<Dialog id="PayoutBalAdjPopover" title="Payout Provisions" >
+		<beginButton>
+			<Button text="Save" press=".onCloseErrorLogPopover"/>
+		</beginButton>
+		<endButton>
+			<Button text="Cancel" press=".onCloseErrorLogPopover"/>
+		</endButton>
+		<VBox class="sapUiSmallMargin">
+			<!--<form:SimpleForm xmlns:form="sap.ui.layout.form" xmlns="sap.m" editable="true"
+				layout="ColumnLayout" columnsM="2">
+				<Label text="Label 1"/>
+				<Input/>
+				<Label text="Label 2"/>
+				<Input/>
+				<Label text="Label 3"/>
+				<Input/>
+			</form:SimpleForm>-->
+			<Table id="idTableARPABudgetItems" inset="false" mode="SingleSelectMaster"  selectionChange="onSelectBudgetLineItem"
+				items="{prov>/prov}"
+				>
+				<headerToolbar>
+					<OverflowToolbar>
+						<content>
+							<ToolbarSpacer/>
+							<ComboBox id="idPopinLayout" placeholder="Popin layout options" change="onPopinLayoutChanged">
+								<items>
+									<core:Item text="Block" key="Block"/>
+									<core:Item text="Grid Large" key="GridLarge"/>
+									<core:Item text="Grid Small" key="GridSmall"/>
+								</items>
+							</ComboBox>
+							<Label text="Sticky options:"/>
+							<CheckBox text="ColumnHeaders" select="onSelect"/>
+							<CheckBox text="HeaderToolbar" select="onSelect"/>
+							<CheckBox text="InfoToolbar" select="onSelect"/>
+							<ToggleButton id="toggleInfoToolbar" text="Hide/Show InfoToolbar" press="onToggleInfoToolbar"/>
+							<Button id="ARPAtoolAddLineItem" icon="sap-icon://add" tooltip="Add Line Item" type="Accept" press="onAddLineItem"/>
+							<Button id="ARPAtoolDeleteLineItem" icon="sap-icon://delete" tooltip="Delete Line Item" type="Accept" press="onDeleteLineItem"/>
+						</content>
+					</OverflowToolbar>
+				</headerToolbar>
+				<!--<infoToolbar>
+					<OverflowToolbar>
+						<Label text=""/>
+					</OverflowToolbar>
+				</infoToolbar>-->
+				<columns>
+					<Column>
+						<!--<Text text="GLAccount{oModelARPABudget>/budgetItemsLayout/GLAccount/Title}"/>-->
+						<Text text="Cost Object"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin">
+						<!--<Text text="Additionaldescription{oModelARPABudget>/budgetItemsLayout/Additionaldescription/Title}"/>-->
+						<Text text="Cost Object Description"/>
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true" hAlign="Begin">
+						<!--<Text text="FundRequested{oModelARPABudget>/budgetItemsLayout/FundRequested/Title}"/>-->
+						<Text text="%"/>
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true" hAlign="Begin">
+						<!--<Text text="FundRequested{oModelARPABudget>/budgetItemsLayout/FundRequested/Title}"/>-->
+						<Text text="Exempt"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<!--<ObjectIdentifier title="{oModel>FormId}" visible="{oModelARPABudget>/budgetItemsLayout/commitmentItem/visible}"/>-->
+							<Text width="25em" text="{prov>Account_ID}"/>
+							<Text width="25em" text="{prov>Account_Description}"/>
+							<Text width="25em" text="{prov>Penalty}"/>
+							<CheckBox selected="{prov>checked}"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</VBox>
+	</Dialog>
+</core:FragmentDefinition>
+```
+
+**Reason:**  
+This fragment defines the UI for the payout provisions dialog, including a table for budget items, toolbar actions, and dialog buttons.

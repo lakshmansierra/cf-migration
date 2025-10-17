@@ -1,0 +1,152 @@
+<core:FragmentDefinition class="sapUiSizeCompact" xmlns="sap.m" xmlns:table="sap.ui.table" xmlns:core="sap.ui.core" xmlns:u="sap.ui.unified"
+	xmlns:f="sap.ui.layout.form" xmlns:layout="sap.ui.layout"  >
+	<Dialog id="non-operated_balance" title="Payout Balance" >
+		
+		<endButton>
+			<Button text="Cancel" press=".onCloseBalance"/>
+		</endButton>
+		
+			
+			<Table id="idTableARPABudgetItems" >
+				
+				<columns>
+					
+					<Column >
+						
+						<Text text="Payout ID"/>
+					</Column>
+					<Column >
+					<Text text="Cost Center"/>
+					</Column>
+					<Column >
+						
+						<Text text="Payout Balance Date"/>
+					</Column>
+                    <Column >
+						
+						<Text text="Payout Balance"/>
+					</Column>
+                    <Column >
+						
+						<Text text="Adjustment Type"/>
+					</Column>
+                    <Column >
+						
+						<Text text="Description"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<Text width="25em" text="00001234"/>
+                            <Text width="25em" text="1007-013"/>
+                            <Text width="25em" text="3/31/2021"/>
+                            <Text width="25em" text="$  237,853.91"/>
+                            <Text width="25em" text="NON-OP"/>
+                            <Text width="25em" text="Beginning Balance Adjustment"/>
+						</cells>
+					</ColumnListItem>
+					<ColumnListItem>
+						<cells>
+							<Text width="25em" text="00001234"/>
+                            <Text width="25em" text="1007-013"/>
+                            <Text width="25em" text="4/30/2021"/>
+                            <Text width="25em" text="$  208,122.17"/>
+                            <Text width="25em" text="NON-OP"/>
+                            <Text width="25em" text="April Balance"/>
+						</cells>
+					</ColumnListItem>
+					<ColumnListItem>
+						<cells>
+							<Text width="25em" text="00001234"/>
+                            <Text width="25em" text="1007-013"/>
+                            <Text width="25em" text="5/31/2021"/>
+                            <Text width="25em" text="$  182,106.90"/>
+                            <Text width="25em" text="NON-OP"/>
+                            <Text width="25em" text="May Balance"/>
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+							<Text width="25em" text="00001234"/>
+                            <Text width="25em" text="1007-013"/>
+                            <Text width="25em" text="6/30/2021"/>
+                            <Text width="25em" text="$  159,343.54"/>
+                            <Text width="25em" text="NON-OP"/>
+                            <Text width="25em" text="June Balance"/>
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+							<Text width="25em" text="00001234"/>
+                            <Text width="25em" text="1007-013"/>
+                            <Text width="25em" text="7/31/2021"/>
+                            <Text width="25em" text="$  139,425.60"/>
+                            <Text width="25em" text="NON-OP"/>
+                            <Text width="25em" text="July Balance"/>
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+							<Text width="25em" text="00001234"/>
+                            <Text width="25em" text="1007-013"/>
+                            <Text width="25em" text="8/31/2021"/>
+                            <Text width="25em" text="$  121,997.40"/>
+                            <Text width="25em" text="NON-OP"/>
+                            <Text width="25em" text="August Balance"/>
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+							<Text width="25em" text="00001234"/>
+                            <Text width="25em" text="1007-013"/>
+                            <Text width="25em" text="9/30/2021"/>
+                            <Text width="25em" text="$  106,747.72"/>
+                            <Text width="25em" text="NON-OP"/>
+                            <Text width="25em" text="September Balance"/>
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+							<Text width="25em" text="00001234"/>
+                            <Text width="25em" text="1007-013"/>
+                            <Text width="25em" text="10/31/2021"/>
+                            <Text width="25em" text="$  93,404.26"/>
+                            <Text width="25em" text="NON-OP"/>
+                            <Text width="25em" text="October Balance"/>
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+							<Text width="25em" text="00001234"/>
+                            <Text width="25em" text="1007-013"/>
+                            <Text width="25em" text="11/30/2021"/>
+                            <Text width="25em" text="$  81,728.72"/>
+                            <Text width="25em" text="NON-OP"/>
+                            <Text width="25em" text="November Balance"/>
+						</cells>
+					</ColumnListItem>
+						<ColumnListItem>
+						<cells>
+							<Text width="25em" text="00001234"/>
+                            <Text width="25em" text="1007-013"/>
+                            <Text width="25em" text="12/31/2021"/>
+                            <Text width="25em" text="$  71,512.63"/>
+                            <Text width="25em" text="NON-OP"/>
+                            <Text width="25em" text="December Balance"/>
+						</cells>
+					</ColumnListItem>
+					
+				</items>
+			</Table>
+				<Button text= "Payout Projection" > </Button>
+				<Button text= "Import" icon="sap-icon://upload" press="onImport"  > </Button>
+				
+   <!--         <OverflowToolbar>-->
+			<!--<ToolbarSpacer/>-->
+			<!--<Button text= "Payout Projection" > </Button>-->
+			
+			<!--</OverflowToolbar>-->
+		
+	</Dialog>
+</core:FragmentDefinition>

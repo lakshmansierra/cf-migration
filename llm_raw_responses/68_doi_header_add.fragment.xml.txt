@@ -1,0 +1,166 @@
+**Action Plan Execution**
+
+**File to copy:**  
+view\doi_header_add.fragment.xml
+
+**Target location:**  
+webapp/view/doi_header_add.fragment.xml
+
+**Reason:**  
+Fragment for DOI header add dialog.
+
+**Content to copy:**  
+```xml
+<core:FragmentDefinition class="sapUiSizeCompact" xmlns="sap.m" xmlns:table="sap.ui.table" xmlns:core="sap.ui.core" xmlns:u="sap.ui.unified"
+	xmlns:f="sap.ui.layout.form" xmlns:layout="sap.ui.layout">
+	<Dialog id="ErrorLogPopover" title="Create Venture">
+		<beginButton>
+			<Button text="Save" press=".onCloseErrorLogPopover"/>
+		</beginButton>
+		<endButton>
+			<Button text="Cancel" press=".onCloseErrorLogPopover"/>
+		</endButton>
+		<VBox class="sapUiSmallMargin">
+			<!--<form:SimpleForm xmlns:form="sap.ui.layout.form" xmlns="sap.m" editable="true"-->
+			<!--	layout="ColumnLayout" columnsM="2">-->
+			<!--	<Label text="Label 1"/>-->
+			<!--	<Input/>-->
+			<!--	<Label text="Label 2"/>-->
+			<!--	<Input/>-->
+			<!--	<Label text="Label 3"/>-->
+			<!--	<Input/>-->
+			<!--</form:SimpleForm>-->
+			<f:SimpleForm editable="true" layout="ColumnLayout" columnsM="2" columnsL="2" labelSpanXL="1" labelSpanL="2" labelSpanM="2" labelSpanS="2"
+				adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" minWidth="500">
+				<!--<Label text="Company">-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Label>-->
+				<!--<Select id="slCompName" forceSelection="true" change="onSelectChange" items="{ path: '/SE_CMP_CODESet' }">-->
+				<!--	<core:Item key="{cmp_code}" text="{cmp_code}"/>-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Select>-->
+				<!--<Label text="Unified DOI Tier">-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Label>-->
+				<!--<Input>-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Input>-->
+				<!--<Label text="Venture">-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Label>-->
+				<!--<Select id="slVentureset" change="onSelectChange" forceSelection="true" items="{ path: '/SE_VENTURESet' }">-->
+				<!--	<core:Item key="{Venture}" text="{Venture}"/>-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Select>-->
+				<!--<Label text="Well ID">-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Label>-->
+				<!--<Select id="slWellID" change="onSelectChange" forceSelection="true" items="{ path: '/SE_WELL_IDSet' }">-->
+				<!--	<core:Item key="{WellID}" text="{WellID}"/>-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Select>-->
+				<!--<Label text="Well Name">-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Label>-->
+				<!--<Select id="slWellName" change="onSelectChange" forceSelection="true" items="{ path: '/SE_WELLNAMESet' }">-->
+				<!--	<core:Item key="{WELLNAME}" text="{WELLNAME}"/>-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Select>-->
+				<!--<Label text="Unified DOI Type">-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Label>-->
+				<!--<Select id="slDOITypeset" change="onSelectChange" forceSelection="true" items="{ path: '/SE_DECKTYPESet' }">-->
+				<!--	<core:Item key="{DECKTYPE}" text="{DECKTYPE}"/>-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Select>-->
+				<!--<Label text="Product">-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Label>-->
+				<!--<Select id="slProductset" change="onSelectChange" forceSelection="true" items="{ path: '/SE_PRODUCTSet' }">-->
+				<!--	<core:Item key="{PRODUCT}" text="{PRODUCT}"/>-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Select>-->
+				<!--<Label text="Start Date">-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Label>-->
+				<!--<DatePicker id="DTP2" displayFormat="short" valueFormat="MM/dd/yyyy" placeholder="Start Date " change="handleChange"
+					class="sapUiSmallMarginBottom">
+					<layoutData>
+						<layout:GridData span="L1 M1"/>
+					</layoutData>
+				</DatePicker>-->
+				<!--<Label text="End Date">-->
+				<!--	<layoutData>-->
+				<!--		<layout:GridData span="L1 M1"/>-->
+				<!--	</layoutData>-->
+				<!--</Label>-->
+				<!--<DatePicker id="DTP1" displayFormat="short" valueFormat="MM/dd/yyyy" placeholder="End Date " change="handleChange"
+					class="sapUiSmallMarginBottom">
+					<layoutData>
+						<layout:GridData span="L1 M1"/>
+					</layoutData>
+				</DatePicker>-->
+			</f:SimpleForm>
+			<!--<f:SimpleForm id="SimpleForm" minWidth="1024"
+					maxContainerCols="4" editable="true" layout="ResponsiveGridLayout"
+					 labelSpanL="3" labelSpanM="3" emptySpanL="4"
+					emptySpanM="4" columnsL="4" columnsM="4">
+					<f:content>
+					<Label text="City" />
+					<Input value="" id="name"/>
+					<Label text="Country" />
+					<Input value="" id="name1">
+						<layoutData>
+						<l:GridData span="L5 M5 S5"/>
+						</layoutData>
+						</Input>
+					<Label text="Created On"/>
+					<Input value="" id="name5"/>
+					<Label text="Age" />
+					<Input value="" id="name2"/>
+					<Label text="Grade" />
+					<Input value="" id="name3"/>
+					<Label text="Comments" />
+					<Input value="" id="name4"/>
+					</f:content>
+					</f:SimpleForm>-->
+		</VBox>
+	</Dialog>
+</core:FragmentDefinition>
+```
+
+**Instructions:**  
+- Copy the above content into the file: **webapp/view/doi_header_add.fragment.xml**  
+- This fragment defines a dialog for adding a DOI header, with a form and buttons.  
+- Most form fields are commented out for future use or reference.  
+- The dialog is titled "Create Venture" and has Save/Cancel buttons.

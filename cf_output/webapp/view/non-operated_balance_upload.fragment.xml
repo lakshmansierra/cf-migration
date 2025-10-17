@@ -1,0 +1,38 @@
+<core:FragmentDefinition class="sapUiSizeCompact" xmlns="sap.m" xmlns:table="sap.ui.table" xmlns:core="sap.ui.core" xmlns:u="sap.ui.unified"
+	xmlns:f="sap.ui.layout.form" xmlns:layout="sap.ui.layout">
+	<Dialog id="View1view" title="Import">
+		
+		<endButton>
+			<Button id="idClosebtt" text="Close" press=".onCloseErrorLogPopover" />
+		</endButton>
+		
+    
+	
+        
+        
+        	<HBox class="sapUiSmallMargin">
+       	<f:SimpleForm id="SimpleFormDisplay354"
+			editable="false"
+			layout="ResponsiveGridLayout"
+			labelSpanXL="3"
+			labelSpanL="3"
+			labelSpanM="3"
+			labelSpanS="12"
+			adjustLabelSpan="false"
+			emptySpanXL="4"
+			emptySpanL="4"
+			emptySpanM="4"
+			emptySpanS="0"
+			columnsXL="1"
+			columnsL="1"
+			columnsM="1"
+			singleContainerFullSize="false" >
+			<f:content>
+				<u:FileUploader id="fileUploaderFS" multiple="false" />
+		<Button text="Import" icon="sap-icon://upload" press="onUploadFile"/>
+			</f:content>
+		</f:SimpleForm>
+        </HBox>
+	
+	</Dialog>
+</core:FragmentDefinition>

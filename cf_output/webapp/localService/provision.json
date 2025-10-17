@@ -1,0 +1,56 @@
+{
+	"prov": [{
+			"Account_ID": "6500.01",
+			"Account_Description": "MISCELLANEOUS COSTS",
+			"Exp_Amt": "1000.00",
+			"Penalty": "0.00%",
+			"checked" : true
+		}, {
+			"Account_ID": "7320.02",
+			"Account_Description": "LABOR - COMPANY",
+			"Exp_Amt": "627.66",
+			"Penalty": "280.00%",
+			"checked" : false
+		},  {
+			"Account_ID": "7320.42",
+			"Account_Description": "LABOR - CONTRACT",
+			"Exp_Amt": "827.53",
+			"Penalty": "280.00%",
+			"checked" : false
+		}, {
+			"Account_ID": "7370.01",
+			"Account_Description": "FUEL, POWER & LUBRICANTS",
+			"Exp_Amt": "11800.00",
+			"Penalty": "300.00%",
+			"checked" : false
+		}
+		, {
+			"Account_ID": "6500.03",
+			"Account_Description": "ADMIN COSTS",
+			"Exp_Amt": "1000.00",
+			"Penalty": "0.00%",
+			"checked" : true
+		}, {
+			"Account_ID": "7370.02",
+			"Account_Description": "FUEL, POWER & LUBRICANTS",
+			"Exp_Amt": "1511.34",
+			"Penalty": "250.00%",
+			"checked" : false
+		},  {
+			"Account_ID": "7370.09",
+			"Account_Description": "REWORK EXPENSE",
+			"Exp_Amt": "1854.87",
+			"Penalty": "200.00%",
+			"checked" : false
+		},  {
+			"Account_ID": "7370.21",
+			"Account_Description": "STIMULATION",
+			"Exp_Amt": "1511.34",
+			"Penalty": "225.00%",
+			"checked" : false
+		}
+		
+		
+
+	]
+}

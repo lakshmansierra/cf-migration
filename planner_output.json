@@ -30,14 +30,14 @@
     },
     {
       "file": "index.html",
-      "reason": "Application entry HTML file, bootstraps the UI5 app.",
+      "reason": "Application entry HTML file, bootstraps UI5 and loads the main component.",
       "action": "adapt",
       "snippets": "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"utf-8\">",
       "target": "webapp/index.html"
     },
     {
       "file": "manifest-bundle.zip",
-      "reason": "Bundle containing manifest and i18n files, used for deployment packaging.",
+      "reason": "Bundle containing manifest and i18n files, used for deployment and packaging.",
       "action": "ignore",
       "snippets": "PK\u0003\u0004\u0014\u0000\u0000\b\b\u0000r;Uyx \u0004\u0000\u0000\u001a\u0000\u0000\n\u0000\u0000\u0000manifest.jsonYms6\u0010_q\u0004S$IIn\bvn<^@WYre\u001ce6E\u0002SLfz޼?=\n2~|",
       "target": ""
@@ -51,35 +51,35 @@
     },
     {
       "file": "neo-app.json",
-      "reason": "Neo environment routing and destination configuration, not compatible with CF.",
+      "reason": "Neo environment routing and resource configuration, not used in Cloud Foundry.",
       "action": "transform",
-      "snippets": "{\n  \"welcomeFile\": \"/index.html\",\n  \"routes\": [\n    {\n      \"path\": \"/resources\",",
-      "target": "cf-root/xs-app.json"
+      "snippets": "{\n  \"welcomeFile\": \"/index.html\",\n  \"routes\": [",
+      "target": "xs-app.json"
     },
     {
       "file": "resources.json",
-      "reason": "Resource manifest for build tools, lists app files and debug/merged status.",
+      "reason": "Resource manifest, lists files for cache busting and build tools.",
       "action": "ignore",
       "snippets": "{\n    \"resources\": [\n        {\n            \"name\": \"view/doi_header_add.fragment.xml\"",
       "target": ""
     },
     {
       "file": "revenue_data.json",
-      "reason": "Sample/mock data for OData service, used for local testing.",
+      "reason": "Sample OData data, used for local mock server and testing.",
       "action": "copy",
-      "snippets": "{\n\t\t\"results\": [{\n\t\t\t\"__metadata\": {\n\t\t\t\t\"id\": \"https://webidetesting9375760-h9110f098.dispatcher.us3.hana.ondemand.com/sap/opu/odata/SAP/ZPRA_REVENUE_SRV_01/Revenue_HDRSet('214754')\",",
+      "snippets": "{\n\t\t\"results\": [{\n\t\t\t\"__metadata\": {",
       "target": "webapp/localService/revenue_data.json"
     },
     {
       "file": "sap-ui-cachebuster-info.json",
-      "reason": "Cachebuster info for UI5 resources, used for static deployments.",
+      "reason": "Cache buster info for UI5 resources, used for static deployments.",
       "action": "ignore",
       "snippets": "{\n  \"test/integration/arrangements/Startup-dbg.js\": 1664278886000,",
       "target": ""
     },
     {
       "file": "_gather_return.txt",
-      "reason": "Internal file listing, not part of application runtime.",
+      "reason": "Internal file listing, not part of the application.",
       "action": "ignore",
       "snippets": "{\n  \"filenames\": [\n    \"Component-dbg.js\",",
       "target": ""
@@ -116,7 +116,7 @@
       "file": "controller\\jointventure-dbg.controller.js",
       "reason": "Debug version of jointventure controller, used for development.",
       "action": "ignore",
-      "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',\n\t'sap/ui/model/json/JSONModel',",
+      "snippets": "sap.ui.define([\n\t'sap/ui/core/mvc/Controller',",
       "target": ""
     },
     {
@@ -233,14 +233,14 @@
     },
     {
       "file": "i18n\\i18n.properties",
-      "reason": "Internationalization resource bundle for UI5 app.",
+      "reason": "Internationalization resource bundle.",
       "action": "copy",
-      "snippets": "title=Sierra Extension for SAP PRA\nappTitle=Sierra PRA\nappDescription=sap-icon://loan",
+      "snippets": "title=Sierra Extension for SAP PRA\nappTitle=Sierra PRA",
       "target": "webapp/i18n/i18n.properties"
     },
     {
       "file": "localService\\metadata.xml",
-      "reason": "OData metadata for local mock server, used for development/testing.",
+      "reason": "OData metadata for local mock server.",
       "action": "copy",
       "snippets": "<edmx:Edmx xmlns:edmx=\"http://schemas.microsoft.com/ado/2007/06/edmx\"",
       "target": "webapp/localService/metadata.xml"
@@ -254,21 +254,21 @@
     },
     {
       "file": "model\\models.js",
-      "reason": "Model factory for device model, used in UI5 app.",
+      "reason": "Model factory for device model and other app models.",
       "action": "copy",
       "snippets": "sap.ui.define([\"sap/ui/model/json/JSONModel\",\"sap/ui/Device\"],function(e,n){",
       "target": "webapp/model/models.js"
     },
     {
       "file": "model\\provision.json",
-      "reason": "Sample/mock data for provisions, used for local testing.",
+      "reason": "Sample provision data for mock server or local testing.",
       "action": "copy",
       "snippets": "{\n\t\"prov\": [{\n\t\t\t\"Account_ID\": \"6500.01\",",
       "target": "webapp/localService/provision.json"
     },
     {
       "file": "resources\\sap-ui-version.json",
-      "reason": "UI5 build version info, not required for runtime.",
+      "reason": "UI5 version info, used for diagnostics.",
       "action": "ignore",
       "snippets": "{\n\t\"name\": \"PRA_Custom\",",
       "target": ""
@@ -289,21 +289,21 @@
     },
     {
       "file": "test\\testsuite.qunit.js",
-      "reason": "QUnit test suite loader script.",
+      "reason": "QUnit test suite loader.",
       "action": "copy",
       "snippets": "window.suite=function(){\"use strict\";var t=new parent.jsUnitTestSuite,",
       "target": "webapp/test/testsuite.qunit.js"
     },
     {
       "file": "test\\integration\\AllJourneys-dbg.js",
-      "reason": "Debug version of integration test journey loader.",
+      "reason": "Debug version of OPA5 integration test journeys.",
       "action": "ignore",
       "snippets": "sap.ui.define([\n\t\"sap/ui/test/Opa5\",",
       "target": ""
     },
     {
       "file": "test\\integration\\AllJourneys.js",
-      "reason": "Integration test journey loader.",
+      "reason": "OPA5 integration test journeys.",
       "action": "copy",
       "snippets": "sap.ui.define([\"sap/ui/test/Opa5\",\"./arrangements/Startup\",",
       "target": "webapp/test/integration/AllJourneys.js"
@@ -317,7 +317,7 @@
     },
     {
       "file": "test\\integration\\NavigationJourney.js",
-      "reason": "Navigation journey test for integration testing.",
+      "reason": "Navigation journey test for OPA5.",
       "action": "copy",
       "snippets": "sap.ui.define([\"sap/ui/test/opaQunit\",\"./pages/main\"],function(e){",
       "target": "webapp/test/integration/NavigationJourney.js"
@@ -331,42 +331,42 @@
     },
     {
       "file": "test\\integration\\opaTests.qunit.html",
-      "reason": "HTML runner for OPA integration tests.",
+      "reason": "HTML runner for OPA QUnit integration tests.",
       "action": "copy",
       "snippets": "<!DOCTYPE html>\n<html>\n<head>\n\t<meta charset=\"utf-8\">",
       "target": "webapp/test/integration/opaTests.qunit.html"
     },
     {
       "file": "test\\integration\\opaTests.qunit.js",
-      "reason": "OPA QUnit test runner script.",
+      "reason": "OPA QUnit test runner.",
       "action": "copy",
       "snippets": "QUnit.config.autostart=false;sap.ui.getCore().attachInit(function(){",
       "target": "webapp/test/integration/opaTests.qunit.js"
     },
     {
       "file": "test\\integration\\arrangements\\Startup-dbg.js",
-      "reason": "Debug version of OPA startup arrangement.",
+      "reason": "Debug version of OPA5 startup arrangement.",
       "action": "ignore",
       "snippets": "sap.ui.define([\n\t\"sap/ui/test/Opa5\"\n], function (Opa5) {",
       "target": ""
     },
     {
       "file": "test\\integration\\arrangements\\Startup.js",
-      "reason": "OPA startup arrangement for integration tests.",
+      "reason": "OPA5 startup arrangement for integration tests.",
       "action": "copy",
       "snippets": "sap.ui.define([\"sap/ui/test/Opa5\"],function(t){",
       "target": "webapp/test/integration/arrangements/Startup.js"
     },
     {
       "file": "test\\integration\\pages\\main-dbg.js",
-      "reason": "Debug version of OPA page object for main view.",
+      "reason": "Debug version of OPA5 page object for main view.",
       "action": "ignore",
       "snippets": "sap.ui.define([\n\t\"sap/ui/test/Opa5\"\n], function (Opa5) {",
       "target": ""
     },
     {
       "file": "test\\integration\\pages\\main.js",
-      "reason": "OPA page object for main view.",
+      "reason": "OPA5 page object for main view.",
       "action": "copy",
       "snippets": "sap.ui.define([\"sap/ui/test/Opa5\"],function(e){",
       "target": "webapp/test/integration/pages/main.js"
@@ -382,7 +382,7 @@
       "file": "test\\unit\\AllTests.js",
       "reason": "Unit test loader.",
       "action": "copy",
-      "snippets": "sap.ui.define([\"sierra/pra/PRA_Custom/test/unit/controller/main.controller\"],",
+      "snippets": "sap.ui.define([\"sierra/pra/PRA_Custom/test/unit/controller/main.controller\"],function(){",
       "target": "webapp/test/unit/AllTests.js"
     },
     {
@@ -401,7 +401,7 @@
     },
     {
       "file": "test\\unit\\unitTests.qunit.js",
-      "reason": "QUnit unit test runner script.",
+      "reason": "QUnit unit test runner.",
       "action": "copy",
       "snippets": "QUnit.config.autostart=false;sap.ui.getCore().attachInit(function(){",
       "target": "webapp/test/unit/unitTests.qunit.js"
@@ -422,14 +422,14 @@
     },
     {
       "file": "view\\business_associate.view.xml",
-      "reason": "XML view for business_associate, UI definition.",
+      "reason": "XML view for business_associate, defines UI layout and bindings.",
       "action": "copy",
       "snippets": "<mvc:View\n\t\tcontrollerName=\"sierra.pra.PRA_Custom.controller.business_associate\"",
       "target": "webapp/view/business_associate.view.xml"
     },
     {
       "file": "view\\collective_doi.view.xml",
-      "reason": "XML view for collective_doi, UI definition.",
+      "reason": "XML view for collective_doi, defines UI layout and bindings.",
       "action": "copy",
       "snippets": "<mvc:View\n\t\tcontrollerName=\"sierra.pra.PRA_Custom.controller.collective_doi\"",
       "target": "webapp/view/collective_doi.view.xml"
@@ -457,28 +457,28 @@
     },
     {
       "file": "view\\collective_doi_header_add.fragment.xml",
-      "reason": "Fragment for collective_doi header add dialog.",
+      "reason": "Fragment for adding collective DOI header.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/collective_doi_header_add.fragment.xml"
     },
     {
       "file": "view\\collective_doi_market_free.fragment.xml",
-      "reason": "Fragment for collective_doi market free dialog.",
+      "reason": "Fragment for collective DOI market free dialog.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/collective_doi_market_free.fragment.xml"
     },
     {
       "file": "view\\doi_header_add.fragment.xml",
-      "reason": "Fragment for DOI header add dialog.",
+      "reason": "Fragment for adding DOI header.",
       "action": "copy",
       "snippets": "<core:FragmentDefinition class=\"sapUiSizeCompact\" xmlns=\"sap.m\"",
       "target": "webapp/view/doi_header_add.fragment.xml"
     },
     {
       "file": "view\\jointventure.view.xml",
-      "reason": "XML view for jointventure, UI definition.",
+      "reason": "XML view for jointventure, defines UI layout and bindings.",
       "action": "copy",
       "snippets": "<mvc:View controllerName=\"sierra.pra.PRA_Custom.controller.jointventure\"",
       "target": "webapp/view/jointventure.view.xml"
@@ -492,14 +492,14 @@
     },
     {
       "file": "view\\main.view.xml",
-      "reason": "Main XML view, defines app shell and navigation.",
+      "reason": "Main XML view, defines the shell and navigation structure.",
       "action": "copy",
       "snippets": "<mvc:View class=\"sapUiSizeCompact\" controllerName=\"sierra.pra.PRA_Custom.controller.main\"",
       "target": "webapp/view/main.view.xml"
     },
     {
       "file": "view\\non-operated.view.xml",
-      "reason": "XML view for non-operated, UI definition.",
+      "reason": "XML view for non-operated, defines UI layout and bindings.",
       "action": "copy",
       "snippets": "<mvc:View controllerName=\"sierra.pra.PRA_Custom.controller.non-operated\"",
       "target": "webapp/view/non-operated.view.xml"
@@ -520,14 +520,14 @@
     },
     {
       "file": "view\\owner_details.view.xml",
-      "reason": "XML view for owner_details, UI definition.",
+      "reason": "XML view for owner_details, defines UI layout and bindings.",
       "action": "copy",
       "snippets": "<mvc:View controllerName=\"sierra.pra.PRA_Custom.controller.payout_position\"",
       "target": "webapp/view/owner_details.view.xml"
     },
     {
       "file": "view\\payout.view.xml",
-      "reason": "XML view for payout, UI definition.",
+      "reason": "XML view for payout, defines UI layout and bindings.",
       "action": "copy",
       "snippets": "<mvc:View controllerName=\"sierra.pra.PRA_Custom.controller.payout\"",
       "target": "webapp/view/payout.view.xml"
@@ -555,7 +555,7 @@
     },
     {
       "file": "view\\payout_position.view.xml",
-      "reason": "XML view for payout_position, UI definition.",
+      "reason": "XML view for payout_position, defines UI layout and bindings.",
       "action": "copy",
       "snippets": "<mvc:View controllerName=\"sierra.pra.PRA_Custom.controller.payout_position\"",
       "target": "webapp/view/payout_position.view.xml"
@@ -569,14 +569,14 @@
     },
     {
       "file": "view\\revenue_header.view.xml",
-      "reason": "XML view for revenue_header, UI definition.",
+      "reason": "XML view for revenue_header, defines UI layout and bindings.",
       "action": "copy",
       "snippets": "<mvc:View\n\t\tcontrollerName=\"sierra.pra.PRA_Custom.controller.revenue_header\"",
       "target": "webapp/view/revenue_header.view.xml"
     },
     {
       "file": "view\\venture.view.xml",
-      "reason": "XML view for venture, UI definition.",
+      "reason": "XML view for venture, defines UI layout and bindings.",
       "action": "copy",
       "snippets": "<mvc:View\n\t\tcontrollerName=\"sierra.pra.PRA_Custom.controller.venture\"",
       "target": "webapp/view/venture.view.xml"

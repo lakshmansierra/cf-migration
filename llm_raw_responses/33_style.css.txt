@@ -1,0 +1,16 @@
+Your plan is to copy the custom CSS file from `css\style.css` to `webapp/css/style.css` with the following content:
+
+```css
+/* Enter your custom styles here */
+```
+
+**Action Steps:**
+1. Create the file at `webapp/css/style.css`.
+2. Add the following content to it:
+
+```css
+/* Enter your custom styles here */
+```
+
+**Result:**
+The file `webapp/css/style.css` will contain your placeholder for custom styles. You can now add your CSS rules to this file as needed.

@@ -1,0 +1,50 @@
+Your plan is to copy the fragment for the collective_doi filter dialog from view\collective_doi_filter.fragment.xml to webapp/view/collective_doi_filter.fragment.xml. Here is the content for webapp/view/collective_doi_filter.fragment.xml as requested:
+
+```xml
+<core:FragmentDefinition class="sapUiSizeCompact" xmlns="sap.m" xmlns:table="sap.ui.table" xmlns:core="sap.ui.core" xmlns:u="sap.ui.unified"
+	xmlns:f="sap.ui.layout.form" xmlns:layout="sap.ui.layout">
+	<Dialog id="ErrorLogPopover" title="Filter">
+		<beginButton>
+			<Button text="Filter" press=".onCloseErrorLogPopover"/>
+		</beginButton>
+		<endButton>
+			<Button text="Cancel" press=".onCloseErrorLogPopover"/>
+		</endButton>
+		<VBox class="sapUiSmallMargin">
+			
+			<f:SimpleForm editable="true" layout="ColumnLayout" columnsM="2" columnsL="2" labelSpanXL="1" labelSpanL="2" labelSpanM="2" labelSpanS="2"
+				adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" minWidth="500">
+				<Label text="Joint venture">
+					<layoutData>
+						<layout:GridData span="L1 M1"/>
+					</layoutData>
+				</Label>
+				<ComboBox id="idJointVenture" change="onChange"   items="">
+                    <core:Item text=" " />
+					<core:Item  text=""/>
+					<layoutData>
+						<layout:GridData span="L1 M1"/>
+					</layoutData>
+				</ComboBox>
+				
+				<Label text="Corp Code">
+					<layoutData>
+						<layout:GridData span="L1 M1"/>
+					</layoutData>
+				</Label>
+				<Input id="CompanyCode"  value="" >
+                <layoutData>
+						<layout:GridData span="L1 M1"/>
+					</layoutData>
+											
+										</Input>
+			
+			</f:SimpleForm>
+			
+		</VBox>
+	</Dialog>
+</core:FragmentDefinition>
+```
+
+**Action completed:**  
+- The fragment has been copied to webapp/view/collective_doi_filter.fragment.xml as per your plan.
